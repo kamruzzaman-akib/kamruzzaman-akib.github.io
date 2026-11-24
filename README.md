@@ -4,21 +4,7 @@ Personal portfolio of Kamruzzaman Akib, Systems Administrator in Lisbon, Portuga
 endpoint management, identity & access and cloud migration across Microsoft 365,
 Google Workspace and Atlassian Cloud.
 
-Live site: https://kamruzzaman-akib.github.io/
-
-## Publishing
-
-This is a GitHub Pages user site, so the repository must be named exactly
-`kamruzzaman-akib.github.io` (your GitHub username followed by `.github.io`) and be
-public. In Settings > Pages, set Source to "Deploy from a branch", branch `main`,
-folder `/ (root)`. `index.html` must sit at the top of the repository, not inside a
-subfolder. The empty `.nojekyll` file tells GitHub Pages to publish the files exactly
-as they are, without running Jekyll first.
-
-Built with plain HTML, CSS and a little JavaScript. No frameworks, no build step,
-hosted for free on GitHub Pages. The design uses a light indigo and sky-blue palette
-(`--accent` and `--accent-2` at the top of `assets/css/style.css`), with an optional
-dark mode from the button in the header.
+Live site: https://kamruzzaman-akib.github.io/kamruzzaman-akib/
 
 ## Structure
 

@@ -7,12 +7,12 @@
   <meta name="description" content="PowerShell scripts by Kamruzzaman Akib for Microsoft 365, Entra ID, Intune, OneDrive and Active Directory: bulk licences, BitLocker key export, group membership, copying groups between tenants, OneDrive export and AD user creation.">
   <meta name="author" content="Kamruzzaman Akib">
   <meta name="theme-color" content="#FFFFFF">
-  <link rel="canonical" href="https://kamruzzamanakib.github.io/scripts/">
+  <link rel="canonical" href="https://kamruzzaman-akib.github.io/scripts/">
   <meta property="og:type" content="article">
   <meta property="og:title" content="PowerShell script library | Kamruzzaman Akib">
   <meta property="og:description" content="PowerShell scripts by Kamruzzaman Akib for Microsoft 365, Entra ID, Intune, OneDrive and Active Directory: bulk licences, BitLocker key export, group membership, copying groups between tenants, OneDrive export and AD user creation.">
-  <meta property="og:url" content="https://kamruzzamanakib.github.io/scripts/">
-  <meta property="og:image" content="https://kamruzzamanakib.github.io/assets/img/og-image.png">
+  <meta property="og:url" content="https://kamruzzaman-akib.github.io/scripts/">
+  <meta property="og:image" content="https://kamruzzaman-akib.github.io/assets/img/og-image.png">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
@@ -26,11 +26,11 @@
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   "name": "PowerShell script library",
-  "url": "https://kamruzzamanakib.github.io/scripts/",
+  "url": "https://kamruzzaman-akib.github.io/scripts/",
   "author": {
     "@type": "Person",
     "name": "Kamruzzaman Akib",
-    "url": "https://kamruzzamanakib.github.io/"
+    "url": "https://kamruzzaman-akib.github.io/"
   },
   "hasPart": [
     {
@@ -38,70 +38,70 @@
       "name": "Add-LicensesFromCsv.ps1",
       "description": "Reads UPNs from a CSV, lets you pick a licence in a grid (with the number still available) and assigns it to everyone who doesn’t have it yet. Skips users with no usage location and ends with a summary.",
       "programmingLanguage": "PowerShell",
-      "url": "https://kamruzzamanakib.github.io/scripts/Add-LicensesFromCsv.ps1"
+      "url": "https://kamruzzaman-akib.github.io/scripts/Add-LicensesFromCsv.ps1"
     },
     {
       "@type": "SoftwareSourceCode",
       "name": "Remove-LicensesFromCsv.ps1",
       "description": "The reverse: removes the chosen licence from every user in the CSV. It spots licences that come from group-based licensing and tells you instead of failing. I used this approach to reclaim hundreds of licences after a tenant integration.",
       "programmingLanguage": "PowerShell",
-      "url": "https://kamruzzamanakib.github.io/scripts/Remove-LicensesFromCsv.ps1"
+      "url": "https://kamruzzaman-akib.github.io/scripts/Remove-LicensesFromCsv.ps1"
     },
     {
       "@type": "SoftwareSourceCode",
       "name": "Export-BitLockerKeys.ps1",
       "description": "Pulls every recovery key stored in Entra ID into one CSV and matches each to a device name from Intune, falling back to Entra ID. Warns about keys it couldn’t read and reminds you to store the file securely.",
       "programmingLanguage": "PowerShell",
-      "url": "https://kamruzzamanakib.github.io/scripts/Export-BitLockerKeys.ps1"
+      "url": "https://kamruzzaman-akib.github.io/scripts/Export-BitLockerKeys.ps1"
     },
     {
       "@type": "SoftwareSourceCode",
       "name": "Get-UserGroupMembership.ps1",
       "description": "Answers “why can (or can’t) this person see that?”. Lists a user’s groups with the type of each one (security, Microsoft 365, distribution list or mail-enabled security) and whether membership is dynamic. Add -Transitive for nested groups and -OutputPath to save a CSV.",
       "programmingLanguage": "PowerShell",
-      "url": "https://kamruzzamanakib.github.io/scripts/Get-UserGroupMembership.ps1"
+      "url": "https://kamruzzaman-akib.github.io/scripts/Get-UserGroupMembership.ps1"
     },
     {
       "@type": "SoftwareSourceCode",
       "name": "Export-EntraGroups.ps1",
       "description": "First half of a tenant-to-tenant group copy: saves each group’s name, description, mail nickname, type, visibility and dynamic membership rule.",
       "programmingLanguage": "PowerShell",
-      "url": "https://kamruzzamanakib.github.io/scripts/Export-EntraGroups.ps1"
+      "url": "https://kamruzzaman-akib.github.io/scripts/Export-EntraGroups.ps1"
     },
     {
       "@type": "SoftwareSourceCode",
       "name": "Import-EntraGroups.ps1",
       "description": "Second half: recreates security and Microsoft 365 groups from the CSV, skips names that already exist and anything Graph can’t create, and saves an old-to-new group ID map for re-pointing assignments.",
       "programmingLanguage": "PowerShell",
-      "url": "https://kamruzzamanakib.github.io/scripts/Import-EntraGroups.ps1"
+      "url": "https://kamruzzaman-akib.github.io/scripts/Import-EntraGroups.ps1"
     },
     {
       "@type": "SoftwareSourceCode",
       "name": "Remove-EntraGroup.ps1",
       "description": "Looks the group up, shows its name and asks before deleting it. Handy for cleaning up after a test import; -Force skips the prompt for loops.",
       "programmingLanguage": "PowerShell",
-      "url": "https://kamruzzamanakib.github.io/scripts/Remove-EntraGroup.ps1"
+      "url": "https://kamruzzaman-akib.github.io/scripts/Remove-EntraGroup.ps1"
     },
     {
       "@type": "SoftwareSourceCode",
       "name": "Add-OneDriveSiteAdmin.ps1",
       "description": "Adds one account as Site Collection Administrator on every OneDrive in the tenant, so a migration export can read the files. Run it again with -Remove when the work is done. Supports -WhatIf and shows progress and a summary.",
       "programmingLanguage": "PowerShell",
-      "url": "https://kamruzzamanakib.github.io/scripts/Add-OneDriveSiteAdmin.ps1"
+      "url": "https://kamruzzaman-akib.github.io/scripts/Add-OneDriveSiteAdmin.ps1"
     },
     {
       "@type": "SoftwareSourceCode",
       "name": "Export-OneDriveFiles.ps1",
       "description": "Downloads every file and keeps the folder structure, one folder per user. Reads every page of large folders, skips files already downloaded so you can resume, and ends with a summary. Replaces my three earlier export scripts.",
       "programmingLanguage": "PowerShell",
-      "url": "https://kamruzzamanakib.github.io/scripts/Export-OneDriveFiles.ps1"
+      "url": "https://kamruzzaman-akib.github.io/scripts/Export-OneDriveFiles.ps1"
     },
     {
       "@type": "SoftwareSourceCode",
       "name": "New-ADUserFromTemplate.ps1",
       "description": "My onboarding shortcut: type the name, pick the OU and a template user, and it builds a unique username, creates the account (password change forced at first sign-in), copies company, department and office, and adds the same groups. Shows everything first and supports -WhatIf.",
       "programmingLanguage": "PowerShell",
-      "url": "https://kamruzzamanakib.github.io/scripts/New-ADUserFromTemplate.ps1"
+      "url": "https://kamruzzaman-akib.github.io/scripts/New-ADUserFromTemplate.ps1"
     }
   ]
 }

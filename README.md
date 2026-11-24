@@ -4,7 +4,16 @@ Personal portfolio of Kamruzzaman Akib, Systems Administrator in Lisbon, Portuga
 endpoint management, identity & access and cloud migration across Microsoft 365,
 Google Workspace and Atlassian Cloud.
 
-Live site: https://kamruzzamanakib.github.io/
+Live site: https://kamruzzaman-akib.github.io/
+
+## Publishing
+
+This is a GitHub Pages user site, so the repository must be named exactly
+`kamruzzaman-akib.github.io` (your GitHub username followed by `.github.io`) and be
+public. In Settings > Pages, set Source to "Deploy from a branch", branch `main`,
+folder `/ (root)`. `index.html` must sit at the top of the repository, not inside a
+subfolder. The empty `.nojekyll` file tells GitHub Pages to publish the files exactly
+as they are, without running Jekyll first.
 
 Built with plain HTML, CSS and a little JavaScript. No frameworks, no build step,
 hosted for free on GitHub Pages. The design uses a light indigo and sky-blue palette
@@ -22,6 +31,7 @@ dark mode from the button in the header.
 | `scripts/index.html` | PowerShell script library page |
 | `scripts/*.ps1` | The scripts themselves, downloadable |
 | `404.html` | Friendly "page not found" page |
+| `.nojekyll` | Empty file: publish as-is, skip Jekyll |
 | `assets/css/style.css` | Design and layout |
 | `assets/js/main.js` | Menu, dark mode, email link, screenshot viewer, animations |
 | `assets/img/` | Icon and link-preview image |

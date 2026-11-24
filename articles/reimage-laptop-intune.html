@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reimage a laptop from USB and enrol it into Microsoft Intune | Kamruzzaman Akib</title>
+  <meta name="description" content="Step-by-step reinstall of Windows 11 Pro from a bootable USB on a Lenovo ThinkPad, then joining the device to Microsoft Entra ID / Intune through the work-or-school OOBE flow, enabling Secure Boot and forcing a policy sync.">
+  <meta name="author" content="Kamruzzaman Akib">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="canonical" href="https://kamruzzamanakib.github.io/articles/reimage-laptop-intune.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Reimage a laptop from USB and enrol it into Microsoft Intune | Kamruzzaman Akib">
+  <meta property="og:description" content="Step-by-step reinstall of Windows 11 Pro from a bootable USB on a Lenovo ThinkPad, then joining the device to Microsoft Entra ID / Intune through the work-or-school OOBE flow, enabling Secure Boot and forcing a policy sync.">
+  <meta property="og:url" content="https://kamruzzamanakib.github.io/articles/reimage-laptop-intune.html">
+  <meta property="og:image" content="https://kamruzzamanakib.github.io/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script>
+    (function () { try { var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Reimage a laptop from USB and enrol it into Microsoft Intune",
+  "description": "Step-by-step reinstall of Windows 11 Pro from a bootable USB on a Lenovo ThinkPad, then joining the device to Microsoft Entra ID / Intune through the work-or-school OOBE flow, enabling Secure Boot and forcing a policy sync.",
+  "author": {
+    "@type": "Person",
+    "name": "Kamruzzaman Akib",
+    "url": "https://kamruzzamanakib.github.io/"
+  },
+  "url": "https://kamruzzamanakib.github.io/articles/reimage-laptop-intune.html",
+  "inLanguage": "en",
+  "keywords": "Windows 11, Intune, Entra ID, Lenovo, Secure Boot"
+}
+  </script>
+</head>
+<body class="article-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="Kamruzzaman Akib, home">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <span class="brand-name">Kamruzzaman Akib</span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#experience">Experience</a></li>
+          <li><a href="../index.html#projects">Projects</a></li>
+          <li><a href="../articles/index.html" class="active" aria-current="page">Articles</a></li>
+          <li><a href="../scripts/index.html">Scripts</a></li>
+          <li><a href="../index.html#skills">Skills</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <article class="article">
+      <header class="article-hero">
+        <div class="container article-narrow">
+          <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a><span aria-hidden="true">/</span><a href="index.html">Articles</a><span aria-hidden="true">/</span><span>Windows &amp; endpoints</span></nav>
+          <p class="article-cat">Windows &amp; endpoints</p>
+          <h1>Reimage a laptop from USB and enrol it into Microsoft Intune</h1>
+          <p class="article-summary">Step-by-step reinstall of Windows 11 Pro from a bootable USB on a Lenovo ThinkPad, then joining the device to Microsoft Entra ID / Intune through the work-or-school OOBE flow, enabling Secure Boot and forcing a policy sync.</p>
+          <p class="article-meta">By Kamruzzaman Akib · 7 min read</p>
+          <ul class="chips"><li>Windows 11</li><li>Intune</li><li>Entra ID</li><li>Lenovo</li><li>Secure Boot</li></ul>
+        </div>
+      </header>
+      <div class="container article-narrow article-body">
+        <aside class="provenance" role="note"><strong>About this article.</strong> I originally wrote this guide for my company’s internal knowledge base. This public version has company names, colleagues’ names and email addresses, internal domains and system details removed. Screenshots are shown at full size: click any of them to enlarge. Only the parts that showed people or company information are blurred. Example addresses use Microsoft’s fictional <code>contoso.com</code> domain.</aside>
+
+<p>I wrote this guide for end users and regional IT staff who had to move laptops into a new company's Intune tenant. It is also the fix when a device runs Windows 10 or <strong>Windows 11 Home</strong>, which cannot join Entra ID. The device is wiped, Windows 11 Pro is installed, and the user's first sign-in enrols it into Intune automatically.</p>
+
+<div class="callout"><strong>Before you start:</strong> you need a bootable Windows 11 stick. See <a href="bootable-windows-11-usb.html">Create a bootable Windows 11 USB</a>. Back up anything on the laptop that isn't already synced to OneDrive. This process erases the disk.</div>
+
+<h2>Part 1: Install Windows 11 Pro</h2>
+<ol class="steps">
+  <li>Insert the bootable USB stick and power on the laptop.</li>
+  <li>On a ThinkPad, when the prompt <em>“To interrupt normal startup, press Enter”</em> appears, keep pressing <kbd>Enter</kbd> until the Startup Interrupt Menu opens, then press <kbd>F12</kbd> to choose a temporary boot device. If Windows boots normally, shut down and try again. Other brands use a different key for the boot menu.</li>
+  <li>If the laptop asks for a BIOS password, stop and contact your IT team.</li>
+  <li>In the Boot Menu, choose the USB flash drive.
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img01.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img01.jpg" alt="ThinkPad boot menu: select the USB drive" width="1278" height="959" loading="lazy" decoding="async"></a><figcaption>ThinkPad boot menu: select the USB drive</figcaption></figure></li>
+  <li>The laptop boots into Windows Setup. Choose your language and keyboard.
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img02.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img02.jpg" alt="Windows Setup language screen" width="1278" height="959" loading="lazy" decoding="async"></a><figcaption>Windows Setup language screen</figcaption></figure></li>
+  <li>Select <strong>Install Windows 11</strong> and tick the box agreeing that everything will be deleted. If you are offered a list of editions, choose <strong>Windows 11 Pro</strong>.
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img03.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img03.jpg" alt="Choose “Install Windows 11” and accept the wipe" width="1278" height="959" loading="lazy" decoding="async"></a><figcaption>Choose “Install Windows 11” and accept the wipe</figcaption></figure></li>
+  <li>Accept the licence terms.
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img04.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img04.jpg" alt="Licence terms" width="1278" height="959" loading="lazy" decoding="async"></a><figcaption>Licence terms</figcaption></figure></li>
+  <li>Choose the <strong>internal disk</strong>, not the USB stick. The easiest way to tell is the size: the internal disk is usually 400 GB+ or 900 GB+, depending on the model.
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img05.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img05.jpg" alt="Pick the large internal disk, not the USB stick" width="1278" height="819" loading="lazy" decoding="async"></a><figcaption>Pick the large internal disk, not the USB stick</figcaption></figure></li>
+  <li>Check the summary. It should say <em>Install Windows 11 Pro</em> and <em>Keep nothing</em>. Click <strong>Install</strong>.
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img06.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img06.jpg" alt="Ready to install" width="1278" height="959" loading="lazy" decoding="async"></a><figcaption>Ready to install</figcaption></figure></li>
+  <li>Installation starts. The laptop restarts several times. This is normal.
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img07.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img07.jpg" alt="Installing Windows 11" width="1278" height="959" loading="lazy" decoding="async"></a><figcaption>Installing Windows 11</figcaption></figure>
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img08.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img08.jpg" alt="Restarts during installation are expected" width="1278" height="959" loading="lazy" decoding="async"></a><figcaption>Restarts during installation are expected</figcaption></figure></li>
+</ol>
+
+<h2>Part 2: Out-of-box setup and Intune enrolment</h2>
+<ol class="steps" start="11">
+  <li>When installation finishes, you'll see the network screen. Connect to Wi-Fi, then confirm region, language and keyboard.
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img09.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img09.jpg" alt="Connect to a network" width="1278" height="959" loading="lazy" decoding="async"></a><figcaption>Connect to a network</figcaption></figure>
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img10.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img10.jpg" alt="Connected, click Next" width="1278" height="959" loading="lazy" decoding="async"></a><figcaption>Connected, click Next</figcaption></figure></li>
+  <li>Windows checks for updates, may restart, and then asks you to name the device. You can skip this; Intune can apply the naming standard later.
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img11.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img11.jpg" alt="Device name (optional)" width="1278" height="959" loading="lazy" decoding="async"></a><figcaption>Device name (optional)</figcaption></figure></li>
+  <li>Choose <strong>Set up for work or school</strong>.
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img12.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img12.jpg" alt="Choose work or school" width="1278" height="959" loading="lazy" decoding="async"></a><figcaption>Choose work or school</figcaption></figure></li>
+  <li>Sign in with your <strong>work account</strong>. This Entra-joins the device and enrols it into Intune.
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img13.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img13.jpg" alt="Sign in with the work account" width="1278" height="959" loading="lazy" decoding="async"></a><figcaption>Sign in with the work account</figcaption></figure></li>
+  <li>After sign-in you land on the desktop. Wait about <strong>15 minutes</strong> while company apps and policies install, then restart.
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img14.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img14.jpg" alt="First desktop after enrolment" width="1448" height="987" loading="lazy" decoding="async"></a><figcaption>First desktop after enrolment</figcaption></figure></li>
+</ol>
+
+<h2>Part 3: Turn Secure Boot back on</h2>
+<ol class="steps" start="16">
+  <li>Restart and press <kbd>F1</kbd> at the Lenovo logo to enter the BIOS.</li>
+  <li>Go to <strong>Security → Secure Boot</strong> and switch Secure Boot <strong>On</strong>.
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img15.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img15.jpg" alt="BIOS: Security → Secure Boot" width="1637" height="1227" loading="lazy" decoding="async"></a><figcaption>BIOS: Security → Secure Boot</figcaption></figure>
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img16.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img16.jpg" alt="Secure Boot switched on" width="1921" height="1118" loading="lazy" decoding="async"></a><figcaption>Secure Boot switched on</figcaption></figure></li>
+  <li>Press <kbd>F10</kbd> and choose <strong>Yes</strong> to save and exit.
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img17.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img17.jpg" alt="Save and exit" width="1881" height="1122" loading="lazy" decoding="async"></a><figcaption>Save and exit</figcaption></figure></li>
+</ol>
+
+<h2 id="part-4">Part 4: Force a sync with Intune</h2>
+<p>If required apps don't appear, push a sync instead of waiting for the next check-in:</p>
+<ol class="steps" start="19">
+  <li>Open <strong>Settings</strong> and search for <strong>Access work or school</strong>.
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img19.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img19.png" alt="Search for “Access work or school”" width="857" height="391" loading="lazy" decoding="async"></a><figcaption>Search for “Access work or school”</figcaption></figure></li>
+  <li>Expand your work account and click <strong>Info</strong>.
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img20.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img20.png" alt="The work account under Access work or school" width="1126" height="608" loading="lazy" decoding="async"></a><figcaption>The work account under Access work or school</figcaption></figure>
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img21.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img21.png" alt="Open Info" width="1076" height="500" loading="lazy" decoding="async"></a><figcaption>Open Info</figcaption></figure></li>
+  <li>Click <strong>Sync</strong>.
+  <figure class="shot wide"><a href="img/reimage-laptop-intune/img22.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reimage-laptop-intune/img22.png" alt="Sync forces a policy and app check-in" width="1478" height="992" loading="lazy" decoding="async"></a><figcaption>Sync forces a policy and app check-in</figcaption></figure></li>
+  <li>Required software (for example Chrome and Microsoft 365 apps) now installs. When the Chrome icon appears on the desktop, installation has started. Edge is already included with Windows 11.</li>
+</ol>
+
+        <nav class="article-pager" aria-label="More articles"><a class="pager-prev" href="bootable-windows-11-usb.html"><span>Previous</span>Create a bootable Windows 11 USB for a clean reimage (OOBE)</a><a class="pager-next" href="reset-laptop-intune.html"><span>Next</span>Reset a laptop with “Clean data” and join it to Intune</a></nav>
+        <p class="back-link"><a href="index.html">← All articles</a></p>
+      </div>
+    </article>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Kamruzzaman Akib. Built with plain HTML, CSS and JavaScript, hosted free on GitHub Pages.</p>
+      <p><a href="../index.html">Home</a> · <a href="../articles/index.html">All articles</a> · <a href="../scripts/index.html">Scripts</a> · <a href="#top">Back to top</a></p>
+    </div>
+  </footer>
+  <script src="../assets/js/main.js" defer></script>
+</body>
+</html>

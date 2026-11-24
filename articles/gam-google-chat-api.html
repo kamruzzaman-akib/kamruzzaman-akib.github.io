@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enable the Google Chat API for GAM (and export every Chat space) | Kamruzzaman Akib</title>
+  <meta name="description" content="The fastest way to find the right GAM project and enable and configure the Google Chat API, then a single GAM command that exports every Chat space in the domain to CSV.">
+  <meta name="author" content="Kamruzzaman Akib">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="canonical" href="https://kamruzzamanakib.github.io/articles/gam-google-chat-api.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Enable the Google Chat API for GAM (and export every Chat space) | Kamruzzaman Akib">
+  <meta property="og:description" content="The fastest way to find the right GAM project and enable and configure the Google Chat API, then a single GAM command that exports every Chat space in the domain to CSV.">
+  <meta property="og:url" content="https://kamruzzamanakib.github.io/articles/gam-google-chat-api.html">
+  <meta property="og:image" content="https://kamruzzamanakib.github.io/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script>
+    (function () { try { var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Enable the Google Chat API for GAM (and export every Chat space)",
+  "description": "The fastest way to find the right GAM project and enable and configure the Google Chat API, then a single GAM command that exports every Chat space in the domain to CSV.",
+  "author": {
+    "@type": "Person",
+    "name": "Kamruzzaman Akib",
+    "url": "https://kamruzzamanakib.github.io/"
+  },
+  "url": "https://kamruzzamanakib.github.io/articles/gam-google-chat-api.html",
+  "inLanguage": "en",
+  "keywords": "Google Workspace, GAM, Google Cloud, Google Chat"
+}
+  </script>
+</head>
+<body class="article-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="Kamruzzaman Akib, home">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <span class="brand-name">Kamruzzaman Akib</span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#experience">Experience</a></li>
+          <li><a href="../index.html#projects">Projects</a></li>
+          <li><a href="../articles/index.html" class="active" aria-current="page">Articles</a></li>
+          <li><a href="../scripts/index.html">Scripts</a></li>
+          <li><a href="../index.html#skills">Skills</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <article class="article">
+      <header class="article-hero">
+        <div class="container article-narrow">
+          <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a><span aria-hidden="true">/</span><a href="index.html">Articles</a><span aria-hidden="true">/</span><span>Google Workspace &amp; Atlassian</span></nav>
+          <p class="article-cat">Google Workspace &amp; Atlassian</p>
+          <h1>Enable the Google Chat API for GAM (and export every Chat space)</h1>
+          <p class="article-summary">The fastest way to find the right GAM project and enable and configure the Google Chat API, then a single GAM command that exports every Chat space in the domain to CSV.</p>
+          <p class="article-meta">By Kamruzzaman Akib · 4 min read</p>
+          <ul class="chips"><li>Google Workspace</li><li>GAM</li><li>Google Cloud</li><li>Google Chat</li></ul>
+        </div>
+      </header>
+      <div class="container article-narrow article-body">
+        <aside class="provenance" role="note"><strong>About this article.</strong> I originally wrote this guide for my company’s internal knowledge base. This public version has company names, colleagues’ names and email addresses, internal domains and system details removed. Screenshots are shown at full size: click any of them to enlarge. Only the parts that showed people or company information are blurred. Example addresses use Microsoft’s fictional <code>contoso.com</code> domain.</aside>
+
+<p>GAM commands for Google Chat fail until the <strong>Google Chat API</strong> is enabled <em>and configured</em> in the Google Cloud project GAM uses. If there are several GAM projects in the console, finding the right one is the slow part. This shortcut skips that.</p>
+
+<h2>Step 1: Let GAM tell you the exact project link</h2>
+<ol class="steps">
+  <li>Open PowerShell on your admin machine and run any Chat command, for example:
+<pre><code class="lang-powershell">gam user admin@contoso.com show chatspaces</code></pre></li>
+  <li>If the API isn't set up, GAM returns an error that contains the <strong>exact setup URL for your project</strong>:
+  <figure class="shot wide"><a href="img/gam-google-chat-api/img05.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/gam-google-chat-api/img05.jpg" alt="GAM prints the setup link for the right project" width="1468" height="380" loading="lazy" decoding="async"></a><figcaption>GAM prints the setup link for the right project</figcaption></figure></li>
+  <li>Open that link in a browser where you're signed in as a <strong>Google Workspace super admin</strong>.</li>
+</ol>
+
+<h2>Step 2: Enable and configure the API</h2>
+<ol class="steps" start="4">
+  <li>Click <strong>Enable</strong> if the API isn't already enabled.</li>
+  <li>From the API page, open the <strong>Configuration</strong> tab and fill in:
+    <ul>
+      <li><strong>App name</strong>, for example <em>GAM Chat Management</em></li>
+      <li><strong>Avatar URL</strong>: a direct link to an image (a free generator: <a href="https://vinicius73.github.io/gravatar-url-generator/#/" rel="noopener">gravatar-url-generator</a>)</li>
+      <li><strong>Description</strong>: a short description</li>
+    </ul></li>
+  <li>Under <strong>Interactive features</strong>, make sure they're <strong>turned off</strong>. GAM only needs API access, not a chat bot.</li>
+  <li>Click <strong>Save</strong>.
+  <figure class="shot"><a href="img/gam-google-chat-api/img02.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/gam-google-chat-api/img02.png" alt="The finished configuration" width="736" height="645" loading="lazy" decoding="async"></a><figcaption>The finished configuration</figcaption></figure></li>
+</ol>
+
+<h2>Step 3: Verify</h2>
+<p>Run the original command again. It now lists the user's Chat spaces:</p>
+<figure class="shot"><a href="img/gam-google-chat-api/img04.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/gam-google-chat-api/img04.jpg" alt="GAM now returns Chat spaces" width="736" height="1037" loading="lazy" decoding="async"></a><figcaption>GAM now returns Chat spaces</figcaption></figure>
+
+<h2>Bonus: export every Chat space in the domain</h2>
+<p>This crawls every user's spaces in parallel and writes them to one CSV (name, display name, created date and so on):</p>
+<pre><code class="lang-powershell">gam config auto_batch_min 1 redirect csv ./AllChatSpaces.csv multiprocess redirect stdout - multiprocess redirect stderr stdout all users print chatspaces types SPACE</code></pre>
+<figure class="shot"><a href="img/gam-google-chat-api/img03.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/gam-google-chat-api/img03.jpg" alt="Crawling every user&#x27;s spaces" width="760" height="405" loading="lazy" decoding="async"></a><figcaption>Crawling every user&#x27;s spaces</figcaption></figure>
+<p>Shared spaces appear once per member, so open the CSV in Excel and use <strong>Data → Remove Duplicates</strong>.</p>
+
+        <nav class="article-pager" aria-label="More articles"><a class="pager-prev" href="copy-entra-groups-between-tenants.html"><span>Previous</span>Copy Entra ID groups to another tenant with PowerShell (export, import and clean-up)</a><a class="pager-next" href="jira-auto-transition-on-comment.html"><span>Next</span>Jira Service Management automation: move a ticket to “Waiting for Support” when the customer comments</a></nav>
+        <p class="back-link"><a href="index.html">← All articles</a></p>
+      </div>
+    </article>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Kamruzzaman Akib. Built with plain HTML, CSS and JavaScript, hosted free on GitHub Pages.</p>
+      <p><a href="../index.html">Home</a> · <a href="../articles/index.html">All articles</a> · <a href="../scripts/index.html">Scripts</a> · <a href="#top">Back to top</a></p>
+    </div>
+  </footer>
+  <script src="../assets/js/main.js" defer></script>
+</body>
+</html>

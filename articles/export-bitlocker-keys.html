@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Export every BitLocker recovery key from Intune, with device names | Kamruzzaman Akib</title>
+  <meta name="description" content="A Microsoft Graph PowerShell script that pulls every BitLocker recovery key stored in Entra ID into one CSV, matches each key to its device name, and reminds you to treat the file like a password vault.">
+  <meta name="author" content="Kamruzzaman Akib">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="canonical" href="https://kamruzzamanakib.github.io/articles/export-bitlocker-keys.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Export every BitLocker recovery key from Intune, with device names | Kamruzzaman Akib">
+  <meta property="og:description" content="A Microsoft Graph PowerShell script that pulls every BitLocker recovery key stored in Entra ID into one CSV, matches each key to its device name, and reminds you to treat the file like a password vault.">
+  <meta property="og:url" content="https://kamruzzamanakib.github.io/articles/export-bitlocker-keys.html">
+  <meta property="og:image" content="https://kamruzzamanakib.github.io/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script>
+    (function () { try { var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Export every BitLocker recovery key from Intune, with device names",
+  "description": "A Microsoft Graph PowerShell script that pulls every BitLocker recovery key stored in Entra ID into one CSV, matches each key to its device name, and reminds you to treat the file like a password vault.",
+  "author": {
+    "@type": "Person",
+    "name": "Kamruzzaman Akib",
+    "url": "https://kamruzzamanakib.github.io/"
+  },
+  "url": "https://kamruzzamanakib.github.io/articles/export-bitlocker-keys.html",
+  "inLanguage": "en",
+  "keywords": "PowerShell, Microsoft Graph, BitLocker, Intune, Entra ID"
+}
+  </script>
+</head>
+<body class="article-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="Kamruzzaman Akib, home">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <span class="brand-name">Kamruzzaman Akib</span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#experience">Experience</a></li>
+          <li><a href="../index.html#projects">Projects</a></li>
+          <li><a href="../articles/index.html" class="active" aria-current="page">Articles</a></li>
+          <li><a href="../scripts/index.html">Scripts</a></li>
+          <li><a href="../index.html#skills">Skills</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <article class="article">
+      <header class="article-hero">
+        <div class="container article-narrow">
+          <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a><span aria-hidden="true">/</span><a href="index.html">Articles</a><span aria-hidden="true">/</span><span>Intune &amp; Entra ID</span></nav>
+          <p class="article-cat">Intune &amp; Entra ID</p>
+          <h1>Export every BitLocker recovery key from Intune, with device names</h1>
+          <p class="article-summary">A Microsoft Graph PowerShell script that pulls every BitLocker recovery key stored in Entra ID into one CSV, matches each key to its device name, and reminds you to treat the file like a password vault.</p>
+          <p class="article-meta">By Kamruzzaman Akib · 4 min read</p>
+          <ul class="chips"><li>PowerShell</li><li>Microsoft Graph</li><li>BitLocker</li><li>Intune</li><li>Entra ID</li></ul>
+        </div>
+      </header>
+      <div class="container article-narrow article-body">
+        <aside class="provenance" role="note"><strong>About this article.</strong> I wrote the scripts in this article for my day-to-day admin work. The public versions have personal file paths removed and were tidied for sharing, and examples use Microsoft’s fictional <code>contoso.com</code> domain. As with any admin script, try it in a test or non-production tenant before you rely on it.</aside>
+
+<p>The Intune admin centre shows BitLocker recovery keys one device at a time. That’s fine for a single locked-out user, but sometimes you need all of them at once: before a tenant migration or a batch of device wipes, for an audit, or as an offline backup in case the admin portals aren’t reachable. This script pulls every recovery key stored in Microsoft Entra ID through Microsoft Graph and puts the device name next to each one.</p>
+
+<aside class="callout warn"><strong>Handle the output like a password vault.</strong> The CSV holds every recovery key, and anyone with the file can unlock those drives. Save it somewhere encrypted, limit who can open it and delete it when you’re done. Every key the script reads is also recorded in the Entra ID audit log (category <em>KeyManagement</em>), so the export is traceable.</aside>
+
+<h2>What you need</h2>
+<ul>
+  <li>The Microsoft Graph PowerShell SDK: <code>Install-Module Microsoft.Graph -Scope CurrentUser</code>.</li>
+  <li>An account with one of these Entra roles: Cloud Device Administrator, Helpdesk Administrator, Intune Administrator, Security Administrator, Security Reader or Global Reader. Without one, Graph only returns keys for devices you own.</li>
+  <li>Consent for three read-only permissions: <code>BitlockerKey.Read.All</code>, <code>DeviceManagementManagedDevices.Read.All</code> and <code>Device.Read.All</code>. You’re asked the first time you sign in.</li>
+</ul>
+
+<h2>How it works</h2>
+<ol class="steps">
+  <li>It builds a lookup table of device names from Intune, matched on the Entra device ID, then fills any gaps from Entra ID for devices Intune no longer manages.</li>
+  <li>It lists every recovery key. Graph leaves the actual key out of that list, so the script asks for each key on its own with <code>-Property key</code>.</li>
+  <li>It writes one row per key (device name, device ID, key ID, volume type, date created and the recovery key), sorted by device name, and warns you if any key couldn’t be read.</li>
+</ol>
+
+<h2>Get the script</h2>
+<div class="script-block"><div class="script-head"><code class="script-name">Export-BitLockerKeys.ps1</code><span class="script-head-links"><a href="../scripts/index.html#export-bitlockerkeys">In the script library</a><a class="btn btn-primary btn-small" href="../scripts/Export-BitLockerKeys.ps1" download>Download</a></span></div><details><summary>Show the full script (104 lines)</summary><pre><code class="lang-powershell">&lt;#
+.SYNOPSIS
+    Exports every BitLocker recovery key stored in Microsoft Entra ID to a CSV file,
+    with the device name next to each key.
+
+.DESCRIPTION
+    The Intune and Entra admin centres show recovery keys one device at a time.
+    This script lists every BitLocker recovery key backed up to Microsoft Entra ID,
+    reads each key, and matches it to a device name: first from Intune managed
+    devices, then from Entra ID devices for anything Intune no longer manages.
+
+    Every key that is read is recorded in the Entra ID audit log (KeyManagement).
+    The output file contains recovery keys: store it somewhere secure, limit who
+    can open it, and delete it when you no longer need it.
+
+.PARAMETER OutputPath
+    Where to save the CSV file. Default: BitLockerKeys-&lt;date&gt;.csv in your Documents folder.
+
+.EXAMPLE
+    .\Export-BitLockerKeys.ps1
+
+.EXAMPLE
+    .\Export-BitLockerKeys.ps1 -OutputPath &#x27;D:\Secure\BitLockerKeys.csv&#x27;
+
+.NOTES
+    Author      : Kamruzzaman Akib
+    Modules     : Microsoft.Graph.Authentication, Microsoft.Graph.Identity.SignIns,
+                  Microsoft.Graph.DeviceManagement, Microsoft.Graph.Identity.DirectoryManagement
+    Permissions : BitlockerKey.Read.All, DeviceManagementManagedDevices.Read.All, Device.Read.All (delegated)
+    Admin role  : one of Cloud Device Administrator, Helpdesk Administrator, Intune Administrator,
+                  Security Administrator, Security Reader or Global Reader
+#&gt;
+#Requires -Modules Microsoft.Graph.Authentication, Microsoft.Graph.Identity.SignIns, Microsoft.Graph.DeviceManagement, Microsoft.Graph.Identity.DirectoryManagement
+
+[CmdletBinding()]
+param(
+    [string]$OutputPath = (Join-Path -Path ([Environment]::GetFolderPath(&#x27;MyDocuments&#x27;)) -ChildPath (&#x27;BitLockerKeys-{0:yyyy-MM-dd}.csv&#x27; -f (Get-Date)))
+)
+
+Connect-MgGraph -Scopes &#x27;BitlockerKey.Read.All&#x27;, &#x27;DeviceManagementManagedDevices.Read.All&#x27;, &#x27;Device.Read.All&#x27; -NoWelcome -ErrorAction Stop
+
+# --- 1. Build a lookup table: Entra device ID -&gt; device name -----------------
+$deviceNames = @{}
+
+Write-Host &#x27;Reading Intune managed devices...&#x27; -ForegroundColor Cyan
+try {
+    Get-MgDeviceManagementManagedDevice -All -Property DeviceName, AzureADDeviceId -ErrorAction Stop |
+        Where-Object { $_.AzureADDeviceId -and $_.AzureADDeviceId -ne &#x27;00000000-0000-0000-0000-000000000000&#x27; } |
+        ForEach-Object { $deviceNames[$_.AzureADDeviceId] = $_.DeviceName }
+} catch {
+    Write-Warning &quot;Could not read Intune devices: $($_.Exception.Message)&quot;
+}
+
+Write-Host &#x27;Reading Entra ID devices...&#x27; -ForegroundColor Cyan
+try {
+    Get-MgDevice -All -Property DeviceId, DisplayName -ErrorAction Stop |
+        Where-Object { $_.DeviceId -and -not $deviceNames.ContainsKey($_.DeviceId) } |
+        ForEach-Object { $deviceNames[$_.DeviceId] = $_.DisplayName }
+} catch {
+    Write-Warning &quot;Could not read Entra ID devices: $($_.Exception.Message)&quot;
+}
+Write-Host &quot;Found names for $($deviceNames.Count) devices.&quot; -ForegroundColor Green
+
+# --- 2. List every recovery key, then read each key value --------------------
+$keys = @(Get-MgInformationProtectionBitlockerRecoveryKey -All -ErrorAction Stop)
+Write-Host &quot;Found $($keys.Count) recovery keys. Reading each one...&quot; -ForegroundColor Cyan
+
+$i = 0
+$results = foreach ($k in $keys) {
+    $i++
+    Write-Progress -Activity &#x27;Reading BitLocker recovery keys&#x27; -Status &quot;$i of $($keys.Count)&quot; -PercentComplete (100 * $i / $keys.Count)
+
+    $recoveryKey = $null
+    try {
+        # The key value is only returned when it is asked for explicitly.
+        $recoveryKey = (Get-MgInformationProtectionBitlockerRecoveryKey -BitlockerRecoveryKeyId $k.Id -Property key -ErrorAction Stop).Key
+    } catch {
+        Write-Warning &quot;Could not read key $($k.Id) (device $($k.DeviceId)): $($_.Exception.Message)&quot;
+    }
+
+    [PSCustomObject]@{
+        DeviceName  = if ($k.DeviceId -and $deviceNames.ContainsKey($k.DeviceId)) { $deviceNames[$k.DeviceId] } else { &#x27;Unknown device&#x27; }
+        DeviceId    = $k.DeviceId
+        KeyId       = $k.Id
+        VolumeType  = $k.VolumeType
+        Created     = $k.CreatedDateTime
+        RecoveryKey = $recoveryKey
+    }
+}
+Write-Progress -Activity &#x27;Reading BitLocker recovery keys&#x27; -Completed
+
+# --- 3. Save the results ------------------------------------------------------
+$folder = Split-Path -Path $OutputPath -Parent
+if ($folder -and -not (Test-Path -Path $folder)) {
+    New-Item -Path $folder -ItemType Directory | Out-Null
+}
+$results | Sort-Object DeviceName, Created | Export-Csv -Path $OutputPath -NoTypeInformation -Encoding UTF8
+
+$missing = @($results | Where-Object { -not $_.RecoveryKey }).Count
+Write-Host &quot;Saved $($results.Count) keys to $OutputPath&quot; -ForegroundColor Green
+if ($missing -gt 0) {
+    Write-Warning &quot;$missing keys could not be read. Check that your account has one of the admin roles listed in the notes.&quot;
+}
+Write-Warning &#x27;This file contains BitLocker recovery keys. Keep it somewhere secure and delete it when you are done.&#x27;</code></pre></details></div>
+
+<h2>Run it</h2>
+<p>By default the file goes to your Documents folder, named with today’s date:</p>
+<pre><code class="lang-powershell">.\Export-BitLockerKeys.ps1</code></pre>
+<p>Or choose where it goes:</p>
+<pre><code class="lang-powershell">.\Export-BitLockerKeys.ps1 -OutputPath 'D:\Secure\BitLockerKeys.csv'</code></pre>
+<p>The result looks like this (example values):</p>
+<pre><code class="lang-csv">"DeviceName","DeviceId","KeyId","VolumeType","Created","RecoveryKey"
+"CONTOSO-LT-014","6f1c2a9e-4b7d-4c1e-9a3f-2d8b5e7c1a40","0b3e9d2f-…","operatingSystemVolume","15/06/2025 13:45","111111-222222-333333-…"
+"CONTOSO-LT-022","9a7e4c10-2f3b-4d8a-8c6e-1b0d5f2a7e93","5c8a1e47-…","operatingSystemVolume","02/09/2025 08:12","444444-555555-666666-…"</code></pre>
+<p>If PowerShell refuses to run the file, see <a href="powershell-execution-policy.html">Fix “running scripts is disabled on this system”</a>.</p>
+
+<h2>Running it on a schedule</h2>
+<p>The script signs in as you (delegated permissions), which suits a one-off export. For an unattended backup, register an app in Entra ID with the <em>application</em> permissions <code>BitlockerKey.Read.All</code>, <code>DeviceManagementManagedDevices.Read.All</code> and <code>Device.Read.All</code>, replace the <code>Connect-MgGraph</code> line with a certificate sign-in (<code>Connect-MgGraph -ClientId … -TenantId … -CertificateThumbprint …</code>), and write the file to a location only the right people can read.</p>
+
+        <nav class="article-pager" aria-label="More articles"><a class="pager-prev" href="fix-80180026-entra-enrolment.html"><span>Previous</span>Fix error 80180026 when enrolling a device in Microsoft Entra ID</a><a class="pager-next" href="powershell-execution-policy.html"><span>Next</span>Fix “running scripts is disabled on this system” in PowerShell</a></nav>
+        <p class="back-link"><a href="index.html">← All articles</a></p>
+      </div>
+    </article>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Kamruzzaman Akib. Built with plain HTML, CSS and JavaScript, hosted free on GitHub Pages.</p>
+      <p><a href="../index.html">Home</a> · <a href="../articles/index.html">All articles</a> · <a href="../scripts/index.html">Scripts</a> · <a href="#top">Back to top</a></p>
+    </div>
+  </footer>
+  <script src="../assets/js/main.js" defer></script>
+</body>
+</html>

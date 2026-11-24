@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fix error 80180026 when enrolling a device in Microsoft Entra ID | Kamruzzaman Akib</title>
+  <meta name="description" content="“Something went wrong… error code 80180026” during Entra join / MDM enrolment: the ExternallyManaged registry value that blocks it, and how to clear it.">
+  <meta name="author" content="Kamruzzaman Akib">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="canonical" href="https://kamruzzamanakib.github.io/articles/fix-80180026-entra-enrolment.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Fix error 80180026 when enrolling a device in Microsoft Entra ID | Kamruzzaman Akib">
+  <meta property="og:description" content="“Something went wrong… error code 80180026” during Entra join / MDM enrolment: the ExternallyManaged registry value that blocks it, and how to clear it.">
+  <meta property="og:url" content="https://kamruzzamanakib.github.io/articles/fix-80180026-entra-enrolment.html">
+  <meta property="og:image" content="https://kamruzzamanakib.github.io/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script>
+    (function () { try { var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Fix error 80180026 when enrolling a device in Microsoft Entra ID",
+  "description": "“Something went wrong… error code 80180026” during Entra join / MDM enrolment: the ExternallyManaged registry value that blocks it, and how to clear it.",
+  "author": {
+    "@type": "Person",
+    "name": "Kamruzzaman Akib",
+    "url": "https://kamruzzamanakib.github.io/"
+  },
+  "url": "https://kamruzzamanakib.github.io/articles/fix-80180026-entra-enrolment.html",
+  "inLanguage": "en",
+  "keywords": "Entra ID, Intune, Registry, Troubleshooting"
+}
+  </script>
+</head>
+<body class="article-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="Kamruzzaman Akib, home">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <span class="brand-name">Kamruzzaman Akib</span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#experience">Experience</a></li>
+          <li><a href="../index.html#projects">Projects</a></li>
+          <li><a href="../articles/index.html" class="active" aria-current="page">Articles</a></li>
+          <li><a href="../scripts/index.html">Scripts</a></li>
+          <li><a href="../index.html#skills">Skills</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <article class="article">
+      <header class="article-hero">
+        <div class="container article-narrow">
+          <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a><span aria-hidden="true">/</span><a href="index.html">Articles</a><span aria-hidden="true">/</span><span>Intune &amp; Entra ID</span></nav>
+          <p class="article-cat">Intune &amp; Entra ID</p>
+          <h1>Fix error 80180026 when enrolling a device in Microsoft Entra ID</h1>
+          <p class="article-summary">“Something went wrong… error code 80180026” during Entra join / MDM enrolment: the ExternallyManaged registry value that blocks it, and how to clear it.</p>
+          <p class="article-meta">By Kamruzzaman Akib · 2 min read</p>
+          <ul class="chips"><li>Entra ID</li><li>Intune</li><li>Registry</li><li>Troubleshooting</li></ul>
+        </div>
+      </header>
+      <div class="container article-narrow article-body">
+        <aside class="provenance" role="note"><strong>About this article.</strong> I originally wrote this guide for my company’s internal knowledge base. This public version has company names, colleagues’ names and email addresses, internal domains and system details removed. Screenshots are shown at full size: click any of them to enlarge. Only the parts that showed people or company information are blurred. Example addresses use Microsoft’s fictional <code>contoso.com</code> domain.</aside>
+
+<p>Error <strong>80180026</strong> is a common, confusing failure when you join a Windows device to Entra ID or enrol it in Intune. The message tells you nothing useful:</p>
+<figure class="shot"><a href="img/fix-80180026-entra-enrolment/img01.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/fix-80180026-entra-enrolment/img01.jpg" alt="The 80180026 error" width="421" height="363" loading="lazy" decoding="async"></a><figcaption>The 80180026 error</figcaption></figure>
+<p>In my experience the cause is a leftover enrolment flag from earlier management, which makes Windows think the device is already managed by someone else.</p>
+
+<h2>Prerequisite</h2>
+<ul><li>Local administrator rights on the computer.</li></ul>
+
+<h2>Fix</h2>
+<ol class="steps">
+  <li>Open <strong>Registry Editor</strong> and go to <code>Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Enrollments</code>.</li>
+  <li>Select <strong>Enrollments</strong>. In the right pane, double-click <strong>ExternallyManaged</strong> and change its value from <code>1</code> to <code>0</code>.
+  <figure class="shot"><a href="img/fix-80180026-entra-enrolment/img02.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/fix-80180026-entra-enrolment/img02.png" alt="ExternallyManaged set to 1 blocks enrolment" width="690" height="72" loading="lazy" decoding="async"></a><figcaption>ExternallyManaged set to 1 blocks enrolment</figcaption></figure></li>
+  <li>Restart the computer and enrol again.</li>
+</ol>
+<p>The same change in PowerShell (run as administrator):</p>
+<pre><code class="lang-powershell">Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Enrollments' -Name 'ExternallyManaged' -Value 0
+Restart-Computer</code></pre>
+
+        <nav class="article-pager" aria-label="More articles"><a class="pager-prev" href="win32-app-intune.html"><span>Previous</span>Package and deploy a Win32 app with Microsoft Intune</a><a class="pager-next" href="export-bitlocker-keys.html"><span>Next</span>Export every BitLocker recovery key from Intune, with device names</a></nav>
+        <p class="back-link"><a href="index.html">← All articles</a></p>
+      </div>
+    </article>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Kamruzzaman Akib. Built with plain HTML, CSS and JavaScript, hosted free on GitHub Pages.</p>
+      <p><a href="../index.html">Home</a> · <a href="../articles/index.html">All articles</a> · <a href="../scripts/index.html">Scripts</a> · <a href="#top">Back to top</a></p>
+    </div>
+  </footer>
+  <script src="../assets/js/main.js" defer></script>
+</body>
+</html>

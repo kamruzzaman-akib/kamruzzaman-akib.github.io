@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jira Service Management automation: move a ticket to “Waiting for Support” when the customer comments | Kamruzzaman Akib</title>
+  <meta name="description" content="A Jira automation rule with an IF block (status = In Progress, type = Support, commenter = reporter) that transitions the issue back to Waiting for Support, so busy queues show which tickets need an agent.">
+  <meta name="author" content="Kamruzzaman Akib">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="canonical" href="https://kamruzzamanakib.github.io/articles/jira-auto-transition-on-comment.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Jira Service Management automation: move a ticket to “Waiting for Support” when the customer comments | Kamruzzaman Akib">
+  <meta property="og:description" content="A Jira automation rule with an IF block (status = In Progress, type = Support, commenter = reporter) that transitions the issue back to Waiting for Support, so busy queues show which tickets need an agent.">
+  <meta property="og:url" content="https://kamruzzamanakib.github.io/articles/jira-auto-transition-on-comment.html">
+  <meta property="og:image" content="https://kamruzzamanakib.github.io/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script>
+    (function () { try { var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Jira Service Management automation: move a ticket to “Waiting for Support” when the customer comments",
+  "description": "A Jira automation rule with an IF block (status = In Progress, type = Support, commenter = reporter) that transitions the issue back to Waiting for Support, so busy queues show which tickets need an agent.",
+  "author": {
+    "@type": "Person",
+    "name": "Kamruzzaman Akib",
+    "url": "https://kamruzzamanakib.github.io/"
+  },
+  "url": "https://kamruzzamanakib.github.io/articles/jira-auto-transition-on-comment.html",
+  "inLanguage": "en",
+  "keywords": "Jira Service Management, Automation, Atlassian Cloud, Workflows"
+}
+  </script>
+</head>
+<body class="article-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="Kamruzzaman Akib, home">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <span class="brand-name">Kamruzzaman Akib</span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#experience">Experience</a></li>
+          <li><a href="../index.html#projects">Projects</a></li>
+          <li><a href="../articles/index.html" class="active" aria-current="page">Articles</a></li>
+          <li><a href="../scripts/index.html">Scripts</a></li>
+          <li><a href="../index.html#skills">Skills</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <article class="article">
+      <header class="article-hero">
+        <div class="container article-narrow">
+          <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a><span aria-hidden="true">/</span><a href="index.html">Articles</a><span aria-hidden="true">/</span><span>Google Workspace &amp; Atlassian</span></nav>
+          <p class="article-cat">Google Workspace &amp; Atlassian</p>
+          <h1>Jira Service Management automation: move a ticket to “Waiting for Support” when the customer comments</h1>
+          <p class="article-summary">A Jira automation rule with an IF block (status = In Progress, type = Support, commenter = reporter) that transitions the issue back to Waiting for Support, so busy queues show which tickets need an agent.</p>
+          <p class="article-meta">By Kamruzzaman Akib · 4 min read</p>
+          <ul class="chips"><li>Jira Service Management</li><li>Automation</li><li>Atlassian Cloud</li><li>Workflows</li></ul>
+        </div>
+      </header>
+      <div class="container article-narrow article-body">
+        <aside class="provenance" role="note"><strong>About this article.</strong> I originally wrote this guide for my company’s internal knowledge base. This public version has company names, colleagues’ names and email addresses, internal domains and system details removed. Screenshots are shown at full size: click any of them to enlarge. Only the parts that showed people or company information are blurred. Example addresses use Microsoft’s fictional <code>contoso.com</code> domain.</aside>
+
+<p>On high-traffic service projects, agents couldn't easily tell which tickets had a new reply from the customer. This rule moves the ticket back to <strong>Waiting for Support</strong> the moment the customer comments, so the queue shows what needs attention.</p>
+
+<h2>Goals</h2>
+<ul>
+  <li>When the <strong>customer</strong> comments, the status becomes <strong>Waiting for Support</strong>.</li>
+  <li>Only when the current status is <strong>In Progress</strong> (not Open or Pending).</li>
+  <li>Only for the <strong>Support</strong> issue type.</li>
+</ul>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li>Check the workflow has a transition from <strong>In Progress</strong> to <strong>Waiting for Support</strong>.
+  <figure class="shot"><a href="img/jira-auto-transition-on-comment/img08.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/jira-auto-transition-on-comment/img08.png" alt="Workflow transition In Progress → Waiting for Support" width="498" height="500" loading="lazy" decoding="async"></a><figcaption>Workflow transition In Progress → Waiting for Support</figcaption></figure></li>
+  <li>Go to <strong>Project settings → Automation → Create rule</strong>.
+  <figure class="shot wide"><a href="img/jira-auto-transition-on-comment/img06.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/jira-auto-transition-on-comment/img06.jpg" alt="Create rule" width="1883" height="392" loading="lazy" decoding="async"></a><figcaption>Create rule</figcaption></figure></li>
+  <li>For the <strong>When</strong> trigger, choose <strong>Issue commented</strong>.
+  <figure class="shot"><a href="img/jira-auto-transition-on-comment/img07.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/jira-auto-transition-on-comment/img07.png" alt="Trigger: Issue commented" width="736" height="420" loading="lazy" decoding="async"></a><figcaption>Trigger: Issue commented</figcaption></figure></li>
+  <li>Add a condition and choose <strong>IF or ELSE: Add condition options</strong>.
+  <figure class="shot"><a href="img/jira-auto-transition-on-comment/img05.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/jira-auto-transition-on-comment/img05.png" alt="IF / ELSE block" width="736" height="420" loading="lazy" decoding="async"></a><figcaption>IF / ELSE block</figcaption></figure></li>
+  <li>Keep <strong>All conditions match</strong> and add an <strong>Issue fields condition</strong>.
+  <figure class="shot"><a href="img/jira-auto-transition-on-comment/img01.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/jira-auto-transition-on-comment/img01.jpg" alt="All conditions match → Issue fields condition" width="558" height="704" loading="lazy" decoding="async"></a><figcaption>All conditions match → Issue fields condition</figcaption></figure></li>
+  <li>Add three conditions:
+    <ul>
+      <li><strong>Status equals In Progress</strong> (Field = Status, Condition = Equals, Value = In Progress)</li>
+      <li><strong>Issue Type equals Support</strong> (Field = Issue Type, Condition = Equals, Value = Support)</li>
+      <li><strong>User condition</strong>: <em>User who triggered the event</em> <strong>is</strong> <em>Issue Reporter</em>. The customer is the reporter, so this means “the customer commented”.</li>
+    </ul></li>
+  <li>For <strong>Then</strong>, add the action <strong>Transition issue</strong>.
+  <figure class="shot"><a href="img/jira-auto-transition-on-comment/img02.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/jira-auto-transition-on-comment/img02.png" alt="Action: Transition issue" width="737" height="340" loading="lazy" decoding="async"></a><figcaption>Action: Transition issue</figcaption></figure></li>
+  <li>Set the destination status to <strong>Waiting for Support</strong>.
+  <figure class="shot"><a href="img/jira-auto-transition-on-comment/img04.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/jira-auto-transition-on-comment/img04.png" alt="Destination status" width="737" height="298" loading="lazy" decoding="async"></a><figcaption>Destination status</figcaption></figure></li>
+  <li>Name the rule and turn it on. The finished rule looks like this:
+  <figure class="shot"><a href="img/jira-auto-transition-on-comment/img03.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/jira-auto-transition-on-comment/img03.png" alt="The finished rule" width="533" height="672" loading="lazy" decoding="async"></a><figcaption>The finished rule</figcaption></figure></li>
+</ol>
+
+        <nav class="article-pager" aria-label="More articles"><a class="pager-prev" href="gam-google-chat-api.html"><span>Previous</span>Enable the Google Chat API for GAM (and export every Chat space)</a><span></span></nav>
+        <p class="back-link"><a href="index.html">← All articles</a></p>
+      </div>
+    </article>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Kamruzzaman Akib. Built with plain HTML, CSS and JavaScript, hosted free on GitHub Pages.</p>
+      <p><a href="../index.html">Home</a> · <a href="../articles/index.html">All articles</a> · <a href="../scripts/index.html">Scripts</a> · <a href="#top">Back to top</a></p>
+    </div>
+  </footer>
+  <script src="../assets/js/main.js" defer></script>
+</body>
+</html>

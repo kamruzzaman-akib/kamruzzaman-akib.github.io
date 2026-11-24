@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reset a laptop with “Clean data” and join it to Intune | Kamruzzaman Akib</title>
+  <meta name="description" content="A no-USB alternative to reimaging: fully patch, disable BitLocker, run Reset this PC with Clean data, then join Microsoft Entra ID / Intune from the out-of-box experience.">
+  <meta name="author" content="Kamruzzaman Akib">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="canonical" href="https://kamruzzamanakib.github.io/articles/reset-laptop-intune.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Reset a laptop with “Clean data” and join it to Intune | Kamruzzaman Akib">
+  <meta property="og:description" content="A no-USB alternative to reimaging: fully patch, disable BitLocker, run Reset this PC with Clean data, then join Microsoft Entra ID / Intune from the out-of-box experience.">
+  <meta property="og:url" content="https://kamruzzamanakib.github.io/articles/reset-laptop-intune.html">
+  <meta property="og:image" content="https://kamruzzamanakib.github.io/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script>
+    (function () { try { var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Reset a laptop with “Clean data” and join it to Intune",
+  "description": "A no-USB alternative to reimaging: fully patch, disable BitLocker, run Reset this PC with Clean data, then join Microsoft Entra ID / Intune from the out-of-box experience.",
+  "author": {
+    "@type": "Person",
+    "name": "Kamruzzaman Akib",
+    "url": "https://kamruzzamanakib.github.io/"
+  },
+  "url": "https://kamruzzamanakib.github.io/articles/reset-laptop-intune.html",
+  "inLanguage": "en",
+  "keywords": "Windows 11, Intune, BitLocker, Reset this PC"
+}
+  </script>
+</head>
+<body class="article-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="Kamruzzaman Akib, home">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <span class="brand-name">Kamruzzaman Akib</span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#experience">Experience</a></li>
+          <li><a href="../index.html#projects">Projects</a></li>
+          <li><a href="../articles/index.html" class="active" aria-current="page">Articles</a></li>
+          <li><a href="../scripts/index.html">Scripts</a></li>
+          <li><a href="../index.html#skills">Skills</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <article class="article">
+      <header class="article-hero">
+        <div class="container article-narrow">
+          <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a><span aria-hidden="true">/</span><a href="index.html">Articles</a><span aria-hidden="true">/</span><span>Windows &amp; endpoints</span></nav>
+          <p class="article-cat">Windows &amp; endpoints</p>
+          <h1>Reset a laptop with “Clean data” and join it to Intune</h1>
+          <p class="article-summary">A no-USB alternative to reimaging: fully patch, disable BitLocker, run Reset this PC with Clean data, then join Microsoft Entra ID / Intune from the out-of-box experience.</p>
+          <p class="article-meta">By Kamruzzaman Akib · 5 min read</p>
+          <ul class="chips"><li>Windows 11</li><li>Intune</li><li>BitLocker</li><li>Reset this PC</li></ul>
+        </div>
+      </header>
+      <div class="container article-narrow article-body">
+        <aside class="provenance" role="note"><strong>About this article.</strong> I originally wrote this guide for my company’s internal knowledge base. This public version has company names, colleagues’ names and email addresses, internal domains and system details removed. Screenshots are shown at full size: click any of them to enlarge. Only the parts that showed people or company information are blurred. Example addresses use Microsoft’s fictional <code>contoso.com</code> domain.</aside>
+
+<p>When a laptop already runs Windows 11 Pro, a built-in reset is quicker than a USB reimage. I used this guide to move a group of laptops from another organisation's management into our Intune tenant, with the users doing most of the work themselves.</p>
+
+<ol class="steps">
+  <li>Open <strong>Windows Update</strong> and install everything until it says no updates are available.
+  <figure class="shot wide"><a href="img/reset-laptop-intune/img01.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reset-laptop-intune/img01.jpg" alt="Install all pending updates first" width="1296" height="830" loading="lazy" decoding="async"></a><figcaption>Install all pending updates first</figcaption></figure></li>
+  <li>Search for <strong>BitLocker</strong> and open <strong>Manage BitLocker</strong>.
+  <figure class="shot"><a href="img/reset-laptop-intune/img02.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reset-laptop-intune/img02.png" alt="Open Manage BitLocker" width="787" height="771" loading="lazy" decoding="async"></a><figcaption>Open Manage BitLocker</figcaption></figure></li>
+  <li>Make sure BitLocker is <strong>off</strong>. If it's on, click <em>Turn off BitLocker</em> and wait until decryption is complete.
+  <figure class="shot wide"><a href="img/reset-laptop-intune/img03.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reset-laptop-intune/img03.png" alt="BitLocker is off" width="1117" height="615" loading="lazy" decoding="async"></a><figcaption>BitLocker is off</figcaption></figure></li>
+  <li>Go to <strong>Settings → System → Recovery</strong>.
+  <figure class="shot wide"><a href="img/reset-laptop-intune/img04.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reset-laptop-intune/img04.jpg" alt="Settings → System → Recovery" width="1204" height="819" loading="lazy" decoding="async"></a><figcaption>Settings → System → Recovery</figcaption></figure></li>
+  <li>Click <strong>Reset PC</strong> next to <em>Reset this PC</em>.
+  <figure class="shot"><a href="img/reset-laptop-intune/img05.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reset-laptop-intune/img05.jpg" alt="Reset PC" width="793" height="621" loading="lazy" decoding="async"></a><figcaption>Reset PC</figcaption></figure></li>
+  <li>Choose <strong>Remove everything</strong>.
+  <figure class="shot wide"><a href="img/reset-laptop-intune/img06.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reset-laptop-intune/img06.jpg" alt="Remove everything" width="1097" height="772" loading="lazy" decoding="async"></a><figcaption>Remove everything</figcaption></figure></li>
+  <li>Choose <strong>Local reinstall</strong>.
+  <figure class="shot wide"><a href="img/reset-laptop-intune/img07.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reset-laptop-intune/img07.jpg" alt="Local reinstall" width="1147" height="772" loading="lazy" decoding="async"></a><figcaption>Local reinstall</figcaption></figure></li>
+  <li>Click <strong>Change settings</strong>.
+  <figure class="shot wide"><a href="img/reset-laptop-intune/img08.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reset-laptop-intune/img08.jpg" alt="Change settings" width="1224" height="772" loading="lazy" decoding="async"></a><figcaption>Change settings</figcaption></figure></li>
+  <li>Turn <strong>Clean data</strong> on (it should say <em>Yes</em>) and click <strong>Confirm</strong>. This wipes the drive properly so nothing from the previous owner can be recovered.
+  <figure class="shot wide"><a href="img/reset-laptop-intune/img09.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reset-laptop-intune/img09.jpg" alt="Clean data: Yes" width="1001" height="643" loading="lazy" decoding="async"></a><figcaption>Clean data: Yes</figcaption></figure></li>
+  <li>Click <strong>Next</strong>, review the summary and click <strong>Reset</strong>.
+  <figure class="shot wide"><a href="img/reset-laptop-intune/img10.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reset-laptop-intune/img10.jpg" alt="Ready to reset this PC" width="910" height="715" loading="lazy" decoding="async"></a><figcaption>Ready to reset this PC</figcaption></figure></li>
+  <li>The reset starts. It can take about an hour and may appear stuck at 62% or 100%. That's normal; let it finish and restart.
+  <figure class="shot wide"><a href="img/reset-laptop-intune/img11.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reset-laptop-intune/img11.jpg" alt="Preparing to reset" width="1058" height="739" loading="lazy" decoding="async"></a><figcaption>Preparing to reset</figcaption></figure></li>
+  <li>When Windows starts, connect to Wi-Fi and choose region and language.
+  <figure class="shot wide"><a href="img/reset-laptop-intune/img12.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reset-laptop-intune/img12.jpg" alt="Connect to a network" width="865" height="649" loading="lazy" decoding="async"></a><figcaption>Connect to a network</figcaption></figure></li>
+  <li>Skip or set the device name.
+  <figure class="shot"><a href="img/reset-laptop-intune/img13.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reset-laptop-intune/img13.jpg" alt="Device name (optional)" width="795" height="595" loading="lazy" decoding="async"></a><figcaption>Device name (optional)</figcaption></figure></li>
+  <li>Choose <strong>Set up for work or school</strong>.
+  <figure class="shot wide"><a href="img/reset-laptop-intune/img14.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reset-laptop-intune/img14.jpg" alt="Set up for work or school" width="865" height="649" loading="lazy" decoding="async"></a><figcaption>Set up for work or school</figcaption></figure></li>
+  <li>Sign in with your <strong>work account</strong>.
+  <figure class="shot wide"><a href="img/reset-laptop-intune/img15.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reset-laptop-intune/img15.jpg" alt="Sign in with the work account" width="865" height="649" loading="lazy" decoding="async"></a><figcaption>Sign in with the work account</figcaption></figure></li>
+  <li>You'll reach the desktop. Wait about 15 minutes for company apps and policies to sync, then restart and install any other tools you use from their official websites.
+  <figure class="shot wide"><a href="img/reset-laptop-intune/img16.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/reset-laptop-intune/img16.jpg" alt="Enrolled and ready" width="865" height="589" loading="lazy" decoding="async"></a><figcaption>Enrolled and ready</figcaption></figure></li>
+</ol>
+<div class="callout">If apps don't appear, force a sync from <em>Settings → Accounts → Access work or school → Info → Sync</em> (see <a href="reimage-laptop-intune.html#part-4">Part 4 of the reimage guide</a>).</div>
+
+        <nav class="article-pager" aria-label="More articles"><a class="pager-prev" href="reimage-laptop-intune.html"><span>Previous</span>Reimage a laptop from USB and enrol it into Microsoft Intune</a><a class="pager-next" href="install-ubuntu-encrypted.html"><span>Next</span>Install Ubuntu 24.04 LTS with full-disk encryption from a bootable USB</a></nav>
+        <p class="back-link"><a href="index.html">← All articles</a></p>
+      </div>
+    </article>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Kamruzzaman Akib. Built with plain HTML, CSS and JavaScript, hosted free on GitHub Pages.</p>
+      <p><a href="../index.html">Home</a> · <a href="../articles/index.html">All articles</a> · <a href="../scripts/index.html">Scripts</a> · <a href="#top">Back to top</a></p>
+    </div>
+  </footer>
+  <script src="../assets/js/main.js" defer></script>
+</body>
+</html>

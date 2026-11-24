@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Install Ubuntu 24.04 LTS with full-disk encryption from a bootable USB | Kamruzzaman Akib</title>
+  <meta name="description" content="Build an Ubuntu USB stick with Rufus and install Ubuntu Desktop 24.04 LTS on an Intel/AMD laptop with LVM + LUKS encryption, ready to be enrolled in Intune.">
+  <meta name="author" content="Kamruzzaman Akib">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="canonical" href="https://kamruzzamanakib.github.io/articles/install-ubuntu-encrypted.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Install Ubuntu 24.04 LTS with full-disk encryption from a bootable USB | Kamruzzaman Akib">
+  <meta property="og:description" content="Build an Ubuntu USB stick with Rufus and install Ubuntu Desktop 24.04 LTS on an Intel/AMD laptop with LVM + LUKS encryption, ready to be enrolled in Intune.">
+  <meta property="og:url" content="https://kamruzzamanakib.github.io/articles/install-ubuntu-encrypted.html">
+  <meta property="og:image" content="https://kamruzzamanakib.github.io/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script>
+    (function () { try { var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Install Ubuntu 24.04 LTS with full-disk encryption from a bootable USB",
+  "description": "Build an Ubuntu USB stick with Rufus and install Ubuntu Desktop 24.04 LTS on an Intel/AMD laptop with LVM + LUKS encryption, ready to be enrolled in Intune.",
+  "author": {
+    "@type": "Person",
+    "name": "Kamruzzaman Akib",
+    "url": "https://kamruzzamanakib.github.io/"
+  },
+  "url": "https://kamruzzamanakib.github.io/articles/install-ubuntu-encrypted.html",
+  "inLanguage": "en",
+  "keywords": "Ubuntu, Linux, Rufus, LUKS, Encryption"
+}
+  </script>
+</head>
+<body class="article-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="Kamruzzaman Akib, home">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <span class="brand-name">Kamruzzaman Akib</span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#experience">Experience</a></li>
+          <li><a href="../index.html#projects">Projects</a></li>
+          <li><a href="../articles/index.html" class="active" aria-current="page">Articles</a></li>
+          <li><a href="../scripts/index.html">Scripts</a></li>
+          <li><a href="../index.html#skills">Skills</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <article class="article">
+      <header class="article-hero">
+        <div class="container article-narrow">
+          <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a><span aria-hidden="true">/</span><a href="index.html">Articles</a><span aria-hidden="true">/</span><span>Windows &amp; endpoints</span></nav>
+          <p class="article-cat">Windows &amp; endpoints</p>
+          <h1>Install Ubuntu 24.04 LTS with full-disk encryption from a bootable USB</h1>
+          <p class="article-summary">Build an Ubuntu USB stick with Rufus and install Ubuntu Desktop 24.04 LTS on an Intel/AMD laptop with LVM + LUKS encryption, ready to be enrolled in Intune.</p>
+          <p class="article-meta">By Kamruzzaman Akib · 7 min read</p>
+          <ul class="chips"><li>Ubuntu</li><li>Linux</li><li>Rufus</li><li>LUKS</li><li>Encryption</li></ul>
+        </div>
+      </header>
+      <div class="container article-narrow article-body">
+        <aside class="provenance" role="note"><strong>About this article.</strong> I originally wrote this guide for my company’s internal knowledge base. This public version has company names, colleagues’ names and email addresses, internal domains and system details removed. Screenshots are shown at full size: click any of them to enlarge. Only the parts that showed people or company information are blurred. Example addresses use Microsoft’s fictional <code>contoso.com</code> domain.</aside>
+
+<p>Some engineers needed Linux laptops that still met our security baseline. This guide gives a repeatable, <strong>encrypted</strong> Ubuntu install that can then be enrolled in Microsoft Intune and Defender.</p>
+
+<h2>Part 1: Create the bootable USB</h2>
+<ol class="steps">
+  <li>Download Ubuntu Desktop (LTS, Intel or AMD 64-bit) from <a href="https://ubuntu.com/download/desktop" rel="noopener">ubuntu.com/download/desktop</a>.
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img01.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img01.jpg" alt="Ubuntu Desktop 24.04 LTS download" width="1491" height="1008" loading="lazy" decoding="async"></a><figcaption>Ubuntu Desktop 24.04 LTS download</figcaption></figure></li>
+  <li>Download Rufus from <a href="https://rufus.ie/en/" rel="noopener">rufus.ie</a> and insert a USB stick (8 GB or more).</li>
+  <li>Open Rufus.
+  <figure class="shot"><a href="img/install-ubuntu-encrypted/img02.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img02.jpg" alt="Rufus with the stick detected" width="471" height="602" loading="lazy" decoding="async"></a><figcaption>Rufus with the stick detected</figcaption></figure></li>
+  <li>Click <strong>Select</strong> and choose the Ubuntu ISO.
+  <figure class="shot"><a href="img/install-ubuntu-encrypted/img03.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img03.jpg" alt="Select the ISO" width="471" height="602" loading="lazy" decoding="async"></a><figcaption>Select the ISO</figcaption></figure></li>
+  <li>Set a <strong>Volume label</strong> and click <strong>Start</strong>.
+  <figure class="shot"><a href="img/install-ubuntu-encrypted/img04.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img04.jpg" alt="Volume label set, click Start" width="466" height="638" loading="lazy" decoding="async"></a><figcaption>Volume label set, click Start</figcaption></figure></li>
+  <li>Rufus detects an <em>ISOHybrid</em> image. Keep <strong>Write in ISO Image mode (Recommended)</strong> and click OK. Then confirm the warning that the stick will be erased.
+  <figure class="shot"><a href="img/install-ubuntu-encrypted/img05.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img05.jpg" alt="Keep ISO Image mode" width="560" height="648" loading="lazy" decoding="async"></a><figcaption>Keep ISO Image mode</figcaption></figure></li>
+  <li>Done!
+  <figure class="shot"><a href="img/install-ubuntu-encrypted/img06.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img06.jpg" alt="The stick is ready" width="469" height="646" loading="lazy" decoding="async"></a><figcaption>The stick is ready</figcaption></figure></li>
+</ol>
+
+<h2>Part 2: Install Ubuntu</h2>
+<ol class="steps" start="8">
+  <li>Shut down the laptop with the USB stick inserted, then power it on.</li>
+  <li>On a ThinkPad, keep pressing <kbd>Enter</kbd> at <em>“To interrupt normal startup”</em>, then press <kbd>F12</kbd> and choose the USB drive. If you're asked for a BIOS password, contact IT.
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img07.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img07.jpg" alt="Boot from the USB drive" width="865" height="649" loading="lazy" decoding="async"></a><figcaption>Boot from the USB drive</figcaption></figure></li>
+  <li>Choose <strong>Try or Install Ubuntu</strong>.
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img08.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img08.png" alt="GRUB menu" width="1026" height="628" loading="lazy" decoding="async"></a><figcaption>GRUB menu</figcaption></figure></li>
+  <li>Wait for the installer to start. Choose your language, skip accessibility, choose a keyboard layout and connect to the internet.
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img09.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img09.png" alt="Welcome to Ubuntu" width="1279" height="801" loading="lazy" decoding="async"></a><figcaption>Welcome to Ubuntu</figcaption></figure></li>
+  <li>If the installer offers an update, click <strong>Update now</strong>, then close the installer when asked.
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img10.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img10.png" alt="Installer update available" width="1277" height="800" loading="lazy" decoding="async"></a><figcaption>Installer update available</figcaption></figure>
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img11.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img11.png" alt="Close the installer after the update" width="1276" height="801" loading="lazy" decoding="async"></a><figcaption>Close the installer after the update</figcaption></figure></li>
+  <li>Double-click <strong>Install Ubuntu</strong> on the desktop and repeat the language/keyboard/network steps.
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img12.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img12.jpg" alt="Relaunch from the desktop icon" width="1276" height="795" loading="lazy" decoding="async"></a><figcaption>Relaunch from the desktop icon</figcaption></figure>
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img13.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img13.jpg" alt="Installer relaunched" width="1278" height="798" loading="lazy" decoding="async"></a><figcaption>Installer relaunched</figcaption></figure></li>
+  <li>Keep <strong>Interactive installation</strong>.
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img14.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img14.jpg" alt="Interactive installation" width="1271" height="795" loading="lazy" decoding="async"></a><figcaption>Interactive installation</figcaption></figure></li>
+  <li>Keep <strong>Default selection</strong> for apps.
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img15.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img15.jpg" alt="Default selection" width="1276" height="791" loading="lazy" decoding="async"></a><figcaption>Default selection</figcaption></figure></li>
+  <li>Tick both <strong>recommended proprietary software</strong> options. They install the drivers for Wi-Fi, audio and graphics.
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img16.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img16.jpg" alt="Install third-party drivers and codecs" width="1276" height="799" loading="lazy" decoding="async"></a><figcaption>Install third-party drivers and codecs</figcaption></figure></li>
+  <li>Under <em>Erase disk and install Ubuntu</em>, click <strong>Advanced features…</strong>
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img17.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img17.jpg" alt="Advanced features" width="1273" height="796" loading="lazy" decoding="async"></a><figcaption>Advanced features</figcaption></figure></li>
+  <li>Choose <strong>Use LVM and encryption</strong>, click OK and then Next.
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img18.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img18.jpg" alt="LVM and encryption" width="1280" height="798" loading="lazy" decoding="async"></a><figcaption>LVM and encryption</figcaption></figure></li>
+  <li>Create a strong <strong>passphrase</strong> (for example two capitalised words joined by a special character, at least 12 characters in total). Store it in your password manager. If it's lost, the data can't be recovered.
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img19.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img19.jpg" alt="Disk passphrase" width="1276" height="797" loading="lazy" decoding="async"></a><figcaption>Disk passphrase</figcaption></figure></li>
+  <li>Create the local administrator account using your organisation's naming standard and password policy.
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img20.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img20.jpg" alt="Create the account" width="1279" height="799" loading="lazy" decoding="async"></a><figcaption>Create the account</figcaption></figure></li>
+  <li>Choose your time zone.
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img21.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img21.jpg" alt="Time zone" width="1271" height="795" loading="lazy" decoding="async"></a><figcaption>Time zone</figcaption></figure></li>
+  <li>Review your choices (you should see <em>LUKS (LVM)</em> under disk encryption) and click <strong>Install</strong>.
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img22.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img22.jpg" alt="Review: LUKS encryption is enabled" width="1276" height="791" loading="lazy" decoding="async"></a><figcaption>Review: LUKS encryption is enabled</figcaption></figure></li>
+  <li>Ubuntu installs.
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img23.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img23.jpg" alt="Copying files" width="1277" height="795" loading="lazy" decoding="async"></a><figcaption>Copying files</figcaption></figure>
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img24.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img24.jpg" alt="Installing the system" width="1284" height="799" loading="lazy" decoding="async"></a><figcaption>Installing the system</figcaption></figure></li>
+  <li>When it's finished, click <strong>Restart now</strong>. Ubuntu is ready to be enrolled in Intune.
+  <figure class="shot wide"><a href="img/install-ubuntu-encrypted/img25.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/install-ubuntu-encrypted/img25.jpg" alt="Installation complete" width="1275" height="798" loading="lazy" decoding="async"></a><figcaption>Installation complete</figcaption></figure></li>
+</ol>
+
+        <nav class="article-pager" aria-label="More articles"><a class="pager-prev" href="reset-laptop-intune.html"><span>Previous</span>Reset a laptop with “Clean data” and join it to Intune</a><a class="pager-next" href="fix-user-profile-service.html"><span>Next</span>Fix “The User Profile Service failed the sign-in” on Windows 11</a></nav>
+        <p class="back-link"><a href="index.html">← All articles</a></p>
+      </div>
+    </article>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Kamruzzaman Akib. Built with plain HTML, CSS and JavaScript, hosted free on GitHub Pages.</p>
+      <p><a href="../index.html">Home</a> · <a href="../articles/index.html">All articles</a> · <a href="../scripts/index.html">Scripts</a> · <a href="#top">Back to top</a></p>
+    </div>
+  </footer>
+  <script src="../assets/js/main.js" defer></script>
+</body>
+</html>

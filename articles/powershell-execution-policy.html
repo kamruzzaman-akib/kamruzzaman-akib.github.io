@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fix “running scripts is disabled on this system” in PowerShell | Kamruzzaman Akib</title>
+  <meta name="description" content="Two common errors when running an admin script for the first time on Windows 11 (scripts disabled / not digitally signed) and the least-permissive Execution Policy change that fixes each.">
+  <meta name="author" content="Kamruzzaman Akib">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="canonical" href="https://kamruzzamanakib.github.io/articles/powershell-execution-policy.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Fix “running scripts is disabled on this system” in PowerShell | Kamruzzaman Akib">
+  <meta property="og:description" content="Two common errors when running an admin script for the first time on Windows 11 (scripts disabled / not digitally signed) and the least-permissive Execution Policy change that fixes each.">
+  <meta property="og:url" content="https://kamruzzamanakib.github.io/articles/powershell-execution-policy.html">
+  <meta property="og:image" content="https://kamruzzamanakib.github.io/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script>
+    (function () { try { var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Fix “running scripts is disabled on this system” in PowerShell",
+  "description": "Two common errors when running an admin script for the first time on Windows 11 (scripts disabled / not digitally signed) and the least-permissive Execution Policy change that fixes each.",
+  "author": {
+    "@type": "Person",
+    "name": "Kamruzzaman Akib",
+    "url": "https://kamruzzamanakib.github.io/"
+  },
+  "url": "https://kamruzzamanakib.github.io/articles/powershell-execution-policy.html",
+  "inLanguage": "en",
+  "keywords": "PowerShell, Execution Policy, Windows 11"
+}
+  </script>
+</head>
+<body class="article-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="Kamruzzaman Akib, home">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <span class="brand-name">Kamruzzaman Akib</span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#experience">Experience</a></li>
+          <li><a href="../index.html#projects">Projects</a></li>
+          <li><a href="../articles/index.html" class="active" aria-current="page">Articles</a></li>
+          <li><a href="../scripts/index.html">Scripts</a></li>
+          <li><a href="../index.html#skills">Skills</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <article class="article">
+      <header class="article-hero">
+        <div class="container article-narrow">
+          <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a><span aria-hidden="true">/</span><a href="index.html">Articles</a><span aria-hidden="true">/</span><span>PowerShell &amp; Microsoft 365</span></nav>
+          <p class="article-cat">PowerShell &amp; Microsoft 365</p>
+          <h1>Fix “running scripts is disabled on this system” in PowerShell</h1>
+          <p class="article-summary">Two common errors when running an admin script for the first time on Windows 11 (scripts disabled / not digitally signed) and the least-permissive Execution Policy change that fixes each.</p>
+          <p class="article-meta">By Kamruzzaman Akib · 3 min read</p>
+          <ul class="chips"><li>PowerShell</li><li>Execution Policy</li><li>Windows 11</li></ul>
+        </div>
+      </header>
+      <div class="container article-narrow article-body">
+        <aside class="provenance" role="note"><strong>About this article.</strong> I originally wrote this guide for my company’s internal knowledge base. This public version has company names, colleagues’ names and email addresses, internal domains and system details removed. Screenshots are shown at full size: click any of them to enlarge. Only the parts that showed people or company information are blurred. Example addresses use Microsoft’s fictional <code>contoso.com</code> domain.</aside>
+
+<p>I wrote this for colleagues running our GAM admin script for the first time, which mostly affected Windows 11 users. Two errors kept coming up.</p>
+
+<h2>Error 1: “Running scripts is disabled on this system”</h2>
+<figure class="shot wide"><a href="img/powershell-execution-policy/img01.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/powershell-execution-policy/img01.jpg" alt="Running scripts is disabled" width="1212" height="132" loading="lazy" decoding="async"></a><figcaption>Running scripts is disabled</figcaption></figure>
+<ol class="steps">
+  <li>Open <strong>PowerShell as administrator</strong>.</li>
+  <li>Allow scripts <strong>for this session only</strong>:
+<pre><code class="lang-powershell">Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass</code></pre></li>
+  <li>Type <kbd>A</kbd> (Yes to All) and press <kbd>Enter</kbd>.
+  <figure class="shot wide"><a href="img/powershell-execution-policy/img04.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/powershell-execution-policy/img04.jpg" alt="Process-scoped bypass" width="1312" height="174" loading="lazy" decoding="async"></a><figcaption>Process-scoped bypass</figcaption></figure></li>
+</ol>
+<p>That should let the script run. If it doesn't, allow locally created scripts:</p>
+<pre><code class="lang-powershell">Set-ExecutionPolicy RemoteSigned</code></pre>
+
+<h2>Error 2: “The script is not digitally signed”</h2>
+<figure class="shot wide"><a href="img/powershell-execution-policy/img05.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/powershell-execution-policy/img05.jpg" alt="Not digitally signed" width="1207" height="151" loading="lazy" decoding="async"></a><figcaption>Not digitally signed</figcaption></figure>
+<ol class="steps">
+  <li>Open PowerShell as administrator and run:
+<pre><code class="lang-powershell">Set-ExecutionPolicy Unrestricted</code></pre></li>
+  <li>Choose <kbd>A</kbd> and press <kbd>Enter</kbd>.
+  <figure class="shot wide"><a href="img/powershell-execution-policy/img02.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/powershell-execution-policy/img02.jpg" alt="Unrestricted" width="1314" height="171" loading="lazy" decoding="async"></a><figcaption>Unrestricted</figcaption></figure></li>
+  <li>The script now runs.
+  <figure class="shot"><a href="img/powershell-execution-policy/img03.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/powershell-execution-policy/img03.jpg" alt="The script runs" width="790" height="250" loading="lazy" decoding="async"></a><figcaption>The script runs</figcaption></figure></li>
+</ol>
+
+<div class="callout"><strong>Security note:</strong> don't leave a machine on <code>Unrestricted</code>. When you're done, switch back to a safer policy:
+<pre><code class="lang-powershell">Set-ExecutionPolicy RemoteSigned</code></pre>
+A better long-term option is <code>Unblock-File .\script.ps1</code> for a downloaded script you trust.</div>
+
+        <nav class="article-pager" aria-label="More articles"><a class="pager-prev" href="export-bitlocker-keys.html"><span>Previous</span>Export every BitLocker recovery key from Intune, with device names</a><a class="pager-next" href="bulk-assign-m365-licences.html"><span>Next</span>Bulk assign (and remove) Microsoft 365 licences with PowerShell and Microsoft Graph</a></nav>
+        <p class="back-link"><a href="index.html">← All articles</a></p>
+      </div>
+    </article>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Kamruzzaman Akib. Built with plain HTML, CSS and JavaScript, hosted free on GitHub Pages.</p>
+      <p><a href="../index.html">Home</a> · <a href="../articles/index.html">All articles</a> · <a href="../scripts/index.html">Scripts</a> · <a href="#top">Back to top</a></p>
+    </div>
+  </footer>
+  <script src="../assets/js/main.js" defer></script>
+</body>
+</html>

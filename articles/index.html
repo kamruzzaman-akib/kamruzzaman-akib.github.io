@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Articles &amp; guides | Kamruzzaman Akib</title>
+  <meta name="description" content="Step-by-step IT guides by Kamruzzaman Akib: Intune, Entra ID, Windows reimaging, PowerShell and Microsoft Graph automation, Exchange Online, Google Workspace GAM and Jira automation.">
+  <meta name="author" content="Kamruzzaman Akib">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="canonical" href="https://kamruzzamanakib.github.io/articles/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Articles &amp; guides | Kamruzzaman Akib">
+  <meta property="og:description" content="Step-by-step IT guides by Kamruzzaman Akib: Intune, Entra ID, Windows reimaging, PowerShell and Microsoft Graph automation, Exchange Online, Google Workspace GAM and Jira automation.">
+  <meta property="og:url" content="https://kamruzzamanakib.github.io/articles/">
+  <meta property="og:image" content="https://kamruzzamanakib.github.io/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script>
+    (function () { try { var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+  </script>
+</head>
+<body class="article-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="Kamruzzaman Akib, home">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <span class="brand-name">Kamruzzaman Akib</span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#experience">Experience</a></li>
+          <li><a href="../index.html#projects">Projects</a></li>
+          <li><a href="../articles/index.html" class="active" aria-current="page">Articles</a></li>
+          <li><a href="../scripts/index.html">Scripts</a></li>
+          <li><a href="../index.html#skills">Skills</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <header class="article-hero">
+      <div class="container">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a><span aria-hidden="true">/</span><span>Articles</span></nav>
+        <p class="article-cat">Knowledge sharing</p>
+        <h1>Articles &amp; guides</h1>
+        <p class="article-summary">16 step-by-step guides from my day-to-day work, rewritten for the public web. Most started as internal knowledge-base articles that I wrote so colleagues and end users could fix things themselves; the rest go with scripts from my <a class="on-dark" href="../scripts/index.html">PowerShell script library</a>.</p>
+      </div>
+    </header>
+    <section class="section">
+      <div class="container">
+        <h2 class="cat-title">Windows &amp; endpoints</h2>
+        <div class="article-grid">
+          <a class="article-card reveal" href="bootable-windows-11-usb.html">
+            <span class="tag">Windows &amp; endpoints</span>
+            <h3>Create a bootable Windows 11 USB for a clean reimage (OOBE)</h3>
+            <p>Build a Windows 11 Pro installation stick with Rufus so a laptop can be wiped and brought back to the out-of-box experience (OOBE), ready for Intune enrolment.</p>
+            <span class="read-more">Read the guide <span aria-hidden="true">→</span></span>
+          </a>
+          <a class="article-card reveal" href="reimage-laptop-intune.html">
+            <span class="tag">Windows &amp; endpoints</span>
+            <h3>Reimage a laptop from USB and enrol it into Microsoft Intune</h3>
+            <p>Step-by-step reinstall of Windows 11 Pro from a bootable USB on a Lenovo ThinkPad, then joining the device to Microsoft Entra ID / Intune through the work-or-school OOBE flow, enabling Secure Boot and forcing a policy sync.</p>
+            <span class="read-more">Read the guide <span aria-hidden="true">→</span></span>
+          </a>
+          <a class="article-card reveal" href="reset-laptop-intune.html">
+            <span class="tag">Windows &amp; endpoints</span>
+            <h3>Reset a laptop with “Clean data” and join it to Intune</h3>
+            <p>A no-USB alternative to reimaging: fully patch, disable BitLocker, run Reset this PC with Clean data, then join Microsoft Entra ID / Intune from the out-of-box experience.</p>
+            <span class="read-more">Read the guide <span aria-hidden="true">→</span></span>
+          </a>
+          <a class="article-card reveal" href="install-ubuntu-encrypted.html">
+            <span class="tag">Windows &amp; endpoints</span>
+            <h3>Install Ubuntu 24.04 LTS with full-disk encryption from a bootable USB</h3>
+            <p>Build an Ubuntu USB stick with Rufus and install Ubuntu Desktop 24.04 LTS on an Intel/AMD laptop with LVM + LUKS encryption, ready to be enrolled in Intune.</p>
+            <span class="read-more">Read the guide <span aria-hidden="true">→</span></span>
+          </a>
+          <a class="article-card reveal" href="fix-user-profile-service.html">
+            <span class="tag">Windows &amp; endpoints</span>
+            <h3>Fix “The User Profile Service failed the sign-in” on Windows 11</h3>
+            <p>A safe order of operations for the User Profile Service sign-in error on Intune-managed devices: a single Advanced Startup round-trip first, and a Keep-my-files reset only if needed.</p>
+            <span class="read-more">Read the guide <span aria-hidden="true">→</span></span>
+          </a>
+          <a class="article-card reveal" href="unable-to-delete-c-wim.html">
+            <span class="tag">Windows &amp; endpoints</span>
+            <h3>Troubleshooting “Unable to delete C:\wim”</h3>
+            <p>When a C:\wim folder can&#x27;t be deleted it&#x27;s usually a WIM image that was never unmounted. Use DISM to find, discard and clean up the mount, then delete the folder.</p>
+            <span class="read-more">Read the guide <span aria-hidden="true">→</span></span>
+          </a>
+        </div>
+        <h2 class="cat-title">Intune &amp; Entra ID</h2>
+        <div class="article-grid">
+          <a class="article-card reveal" href="win32-app-intune.html">
+            <span class="tag">Intune &amp; Entra ID</span>
+            <h3>Package and deploy a Win32 app with Microsoft Intune</h3>
+            <p>Use the Microsoft Win32 Content Prep Tool to build an .intunewin package, then create the Win32 app in Intune with silent install/uninstall commands, a file detection rule and a group assignment.</p>
+            <span class="read-more">Read the guide <span aria-hidden="true">→</span></span>
+          </a>
+          <a class="article-card reveal" href="fix-80180026-entra-enrolment.html">
+            <span class="tag">Intune &amp; Entra ID</span>
+            <h3>Fix error 80180026 when enrolling a device in Microsoft Entra ID</h3>
+            <p>“Something went wrong… error code 80180026” during Entra join / MDM enrolment: the ExternallyManaged registry value that blocks it, and how to clear it.</p>
+            <span class="read-more">Read the guide <span aria-hidden="true">→</span></span>
+          </a>
+          <a class="article-card reveal" href="export-bitlocker-keys.html">
+            <span class="tag">Intune &amp; Entra ID</span>
+            <h3>Export every BitLocker recovery key from Intune, with device names</h3>
+            <p>A Microsoft Graph PowerShell script that pulls every BitLocker recovery key stored in Entra ID into one CSV, matches each key to its device name, and reminds you to treat the file like a password vault.</p>
+            <span class="read-more">Read the guide <span aria-hidden="true">→</span></span>
+          </a>
+        </div>
+        <h2 class="cat-title">PowerShell &amp; Microsoft 365</h2>
+        <div class="article-grid">
+          <a class="article-card reveal" href="powershell-execution-policy.html">
+            <span class="tag">PowerShell &amp; Microsoft 365</span>
+            <h3>Fix “running scripts is disabled on this system” in PowerShell</h3>
+            <p>Two common errors when running an admin script for the first time on Windows 11 (scripts disabled / not digitally signed) and the least-permissive Execution Policy change that fixes each.</p>
+            <span class="read-more">Read the guide <span aria-hidden="true">→</span></span>
+          </a>
+          <a class="article-card reveal" href="bulk-assign-m365-licences.html">
+            <span class="tag">PowerShell &amp; Microsoft 365</span>
+            <h3>Bulk assign (and remove) Microsoft 365 licences with PowerShell and Microsoft Graph</h3>
+            <p>Two Graph PowerShell scripts that read UPNs from a CSV, let you pick a licence from a grid, and assign it to (or remove it from) every user, with a dry-run mode and checks for usage location and group-based licences.</p>
+            <span class="read-more">Read the guide <span aria-hidden="true">→</span></span>
+          </a>
+          <a class="article-card reveal" href="bulk-distribution-groups-exchange.html">
+            <span class="tag">PowerShell &amp; Microsoft 365</span>
+            <h3>Bulk create distribution groups in Exchange Online from a CSV</h3>
+            <p>Create many Exchange Online distribution lists in one run, with owners, members and notes, from a CSV using the ExchangeOnlineManagement module. Each group is reported as SUCCESS or FAILED.</p>
+            <span class="read-more">Read the guide <span aria-hidden="true">→</span></span>
+          </a>
+          <a class="article-card reveal" href="bulk-download-onedrive.html">
+            <span class="tag">PowerShell &amp; Microsoft 365</span>
+            <h3>Bulk download every user&#x27;s OneDrive with PowerShell and Microsoft Graph</h3>
+            <p>Grant yourself Site Collection Admin on every OneDrive, download every file (keeping the folder structure) for one user, a CSV list or the whole organisation, then remove your access. Two downloadable scripts, written for a tenant-to-tenant migration.</p>
+            <span class="read-more">Read the guide <span aria-hidden="true">→</span></span>
+          </a>
+          <a class="article-card reveal" href="copy-entra-groups-between-tenants.html">
+            <span class="tag">PowerShell &amp; Microsoft 365</span>
+            <h3>Copy Entra ID groups to another tenant with PowerShell (export, import and clean-up)</h3>
+            <p>Three Microsoft Graph PowerShell scripts for a tenant-to-tenant move: export every group to CSV, recreate them in the new tenant with a dry run and an old-to-new ID map, and delete a group by ID when you need to clean up.</p>
+            <span class="read-more">Read the guide <span aria-hidden="true">→</span></span>
+          </a>
+        </div>
+        <h2 class="cat-title">Google Workspace &amp; Atlassian</h2>
+        <div class="article-grid">
+          <a class="article-card reveal" href="gam-google-chat-api.html">
+            <span class="tag">Google Workspace &amp; Atlassian</span>
+            <h3>Enable the Google Chat API for GAM (and export every Chat space)</h3>
+            <p>The fastest way to find the right GAM project and enable and configure the Google Chat API, then a single GAM command that exports every Chat space in the domain to CSV.</p>
+            <span class="read-more">Read the guide <span aria-hidden="true">→</span></span>
+          </a>
+          <a class="article-card reveal" href="jira-auto-transition-on-comment.html">
+            <span class="tag">Google Workspace &amp; Atlassian</span>
+            <h3>Jira Service Management automation: move a ticket to “Waiting for Support” when the customer comments</h3>
+            <p>A Jira automation rule with an IF block (status = In Progress, type = Support, commenter = reporter) that transitions the issue back to Waiting for Support, so busy queues show which tickets need an agent.</p>
+            <span class="read-more">Read the guide <span aria-hidden="true">→</span></span>
+          </a>
+        </div>
+        <div class="internal-note reveal">
+          <div>
+            <h3>And many more that stay internal</h3>
+            <p>The guides on this site are a selection. I have written many more articles, runbooks and process documents that live on my employers’ internal knowledge bases. They contain company systems, people and data, so they can’t be published. Topics include:</p>
+            <ul class="tick-list"><li>Correctly joining (not just registering) a device to Microsoft Entra ID</li><li>Migrating a user’s device between Microsoft 365 tenants</li><li>Fix: “not enrolled in Duo” error at Windows sign-in</li><li>Changing a Mac’s sleep time without admin rights</li><li>Jira automation: satisfaction surveys for internal accounts only</li><li>Satisfaction surveys for team-managed Jira projects</li><li>Employee offboarding checklist</li><li>Device migration runbooks for a regional IT team</li><li>Onboarding guides, runbooks and process documentation</li></ul>
+            <p class="small">Happy to walk through any of them in an interview, with company details removed.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Kamruzzaman Akib. Built with plain HTML, CSS and JavaScript, hosted free on GitHub Pages.</p>
+      <p><a href="../index.html">Home</a> · <a href="../articles/index.html">All articles</a> · <a href="../scripts/index.html">Scripts</a> · <a href="#top">Back to top</a></p>
+    </div>
+  </footer>
+  <script src="../assets/js/main.js" defer></script>
+</body>
+</html>

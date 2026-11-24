@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PowerShell script library | Kamruzzaman Akib</title>
+  <meta name="description" content="PowerShell scripts by Kamruzzaman Akib for Microsoft 365, Entra ID, Intune, OneDrive and Active Directory: bulk licences, BitLocker key export, group membership, copying groups between tenants, OneDrive export and AD user creation.">
+  <meta name="author" content="Kamruzzaman Akib">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="canonical" href="https://kamruzzamanakib.github.io/scripts/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="PowerShell script library | Kamruzzaman Akib">
+  <meta property="og:description" content="PowerShell scripts by Kamruzzaman Akib for Microsoft 365, Entra ID, Intune, OneDrive and Active Directory: bulk licences, BitLocker key export, group membership, copying groups between tenants, OneDrive export and AD user creation.">
+  <meta property="og:url" content="https://kamruzzamanakib.github.io/scripts/">
+  <meta property="og:image" content="https://kamruzzamanakib.github.io/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script>
+    (function () { try { var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "PowerShell script library",
+  "url": "https://kamruzzamanakib.github.io/scripts/",
+  "author": {
+    "@type": "Person",
+    "name": "Kamruzzaman Akib",
+    "url": "https://kamruzzamanakib.github.io/"
+  },
+  "hasPart": [
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "Add-LicensesFromCsv.ps1",
+      "description": "Reads UPNs from a CSV, lets you pick a licence in a grid (with the number still available) and assigns it to everyone who doesn’t have it yet. Skips users with no usage location and ends with a summary.",
+      "programmingLanguage": "PowerShell",
+      "url": "https://kamruzzamanakib.github.io/scripts/Add-LicensesFromCsv.ps1"
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "Remove-LicensesFromCsv.ps1",
+      "description": "The reverse: removes the chosen licence from every user in the CSV. It spots licences that come from group-based licensing and tells you instead of failing. I used this approach to reclaim hundreds of licences after a tenant integration.",
+      "programmingLanguage": "PowerShell",
+      "url": "https://kamruzzamanakib.github.io/scripts/Remove-LicensesFromCsv.ps1"
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "Export-BitLockerKeys.ps1",
+      "description": "Pulls every recovery key stored in Entra ID into one CSV and matches each to a device name from Intune, falling back to Entra ID. Warns about keys it couldn’t read and reminds you to store the file securely.",
+      "programmingLanguage": "PowerShell",
+      "url": "https://kamruzzamanakib.github.io/scripts/Export-BitLockerKeys.ps1"
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "Get-UserGroupMembership.ps1",
+      "description": "Answers “why can (or can’t) this person see that?”. Lists a user’s groups with the type of each one (security, Microsoft 365, distribution list or mail-enabled security) and whether membership is dynamic. Add -Transitive for nested groups and -OutputPath to save a CSV.",
+      "programmingLanguage": "PowerShell",
+      "url": "https://kamruzzamanakib.github.io/scripts/Get-UserGroupMembership.ps1"
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "Export-EntraGroups.ps1",
+      "description": "First half of a tenant-to-tenant group copy: saves each group’s name, description, mail nickname, type, visibility and dynamic membership rule.",
+      "programmingLanguage": "PowerShell",
+      "url": "https://kamruzzamanakib.github.io/scripts/Export-EntraGroups.ps1"
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "Import-EntraGroups.ps1",
+      "description": "Second half: recreates security and Microsoft 365 groups from the CSV, skips names that already exist and anything Graph can’t create, and saves an old-to-new group ID map for re-pointing assignments.",
+      "programmingLanguage": "PowerShell",
+      "url": "https://kamruzzamanakib.github.io/scripts/Import-EntraGroups.ps1"
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "Remove-EntraGroup.ps1",
+      "description": "Looks the group up, shows its name and asks before deleting it. Handy for cleaning up after a test import; -Force skips the prompt for loops.",
+      "programmingLanguage": "PowerShell",
+      "url": "https://kamruzzamanakib.github.io/scripts/Remove-EntraGroup.ps1"
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "Add-OneDriveSiteAdmin.ps1",
+      "description": "Adds one account as Site Collection Administrator on every OneDrive in the tenant, so a migration export can read the files. Run it again with -Remove when the work is done. Supports -WhatIf and shows progress and a summary.",
+      "programmingLanguage": "PowerShell",
+      "url": "https://kamruzzamanakib.github.io/scripts/Add-OneDriveSiteAdmin.ps1"
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "Export-OneDriveFiles.ps1",
+      "description": "Downloads every file and keeps the folder structure, one folder per user. Reads every page of large folders, skips files already downloaded so you can resume, and ends with a summary. Replaces my three earlier export scripts.",
+      "programmingLanguage": "PowerShell",
+      "url": "https://kamruzzamanakib.github.io/scripts/Export-OneDriveFiles.ps1"
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "New-ADUserFromTemplate.ps1",
+      "description": "My onboarding shortcut: type the name, pick the OU and a template user, and it builds a unique username, creates the account (password change forced at first sign-in), copies company, department and office, and adds the same groups. Shows everything first and supports -WhatIf.",
+      "programmingLanguage": "PowerShell",
+      "url": "https://kamruzzamanakib.github.io/scripts/New-ADUserFromTemplate.ps1"
+    }
+  ]
+}
+  </script>
+</head>
+<body class="article-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="Kamruzzaman Akib, home">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <span class="brand-name">Kamruzzaman Akib</span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#experience">Experience</a></li>
+          <li><a href="../index.html#projects">Projects</a></li>
+          <li><a href="../articles/index.html">Articles</a></li>
+          <li><a href="../scripts/index.html" class="active" aria-current="page">Scripts</a></li>
+          <li><a href="../index.html#skills">Skills</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <header class="article-hero">
+      <div class="container">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a><span aria-hidden="true">/</span><span>Scripts</span></nav>
+        <p class="article-cat">Automation</p>
+        <h1>PowerShell script library</h1>
+        <p class="article-summary">Scripts I wrote to take slow, repetitive admin work off my plate, cleaned up for public use. Most use the Microsoft Graph PowerShell SDK; the rest use the SharePoint Online and Active Directory modules. They all come with built-in help, and every script that changes something supports a <code class="on-dark">-WhatIf</code> dry run.</p>
+      </div>
+    </header>
+    <section class="section">
+      <div class="container">
+        <div class="callout script-intro">
+          <strong>Before you run any of them</strong>
+          <ul>
+            <li>Read the built-in help first: <code>Get-Help .\Export-BitLockerKeys.ps1 -Full</code></li>
+            <li>Install the Graph SDK once with <code>Install-Module Microsoft.Graph -Scope CurrentUser</code>. Each script checks for the modules it needs and says which one is missing.</li>
+            <li>Try them in a test or non-production tenant, and use <code>-WhatIf</code> before any real change.</li>
+            <li>If Windows blocks the file, see <a href="../articles/powershell-execution-policy.html">Fix “running scripts is disabled on this system”</a>.</li>
+          </ul>
+        </div>
+        <h2 class="cat-title">Licensing</h2>
+        <div class="script-list">
+        <article class="script-entry reveal" id="add-licensesfromcsv">
+          <div class="script-entry-head">
+            <div>
+              <code class="script-file">Add-LicensesFromCsv.ps1</code>
+              <h3>Bulk assign a Microsoft 365 licence from a CSV</h3>
+            </div>
+            <div class="script-actions">
+              <a class="btn btn-primary btn-small" href="Add-LicensesFromCsv.ps1" download>Download</a>
+              <a class="btn btn-outline btn-small" href="../articles/bulk-assign-m365-licences.html">Read the guide</a>
+            </div>
+          </div>
+          <p>Reads UPNs from a CSV, lets you pick a licence in a grid (with the number still available) and assigns it to everyone who doesn’t have it yet. Skips users with no usage location and ends with a summary.</p>
+          <p class="script-meta"><strong>Graph permissions:</strong> <code>LicenseAssignment.ReadWrite.All</code>, <code>User.Read.All</code>, <code>Organization.Read.All</code><br><strong>Admin role:</strong> License Administrator or User Administrator</p>
+          <details><summary>View the code (115 lines)</summary><pre><code class="lang-powershell">&lt;#
+.SYNOPSIS
+    Assigns one Microsoft 365 licence to every user listed in a CSV file.
+
+.DESCRIPTION
+    Reads user principal names (UPNs) from a CSV file, lets you pick a licence (SKU)
+    from the tenant in a grid, then assigns it to each user who does not already have it.
+
+    Users who already have the licence are skipped. Users with no usage location are
+    skipped too, because Microsoft 365 cannot assign a licence without one.
+
+    Run it with -WhatIf first to see what would change without changing anything.
+
+.PARAMETER CsvPath
+    Path to the CSV file. It needs a column named UPN (or UserPrincipalName).
+
+.EXAMPLE
+    .\Add-LicensesFromCsv.ps1 -CsvPath .\users.csv -WhatIf
+    Dry run: shows which users would get the licence.
+
+.EXAMPLE
+    .\Add-LicensesFromCsv.ps1 -CsvPath .\users.csv
+    Assigns the licence you pick to every user in users.csv.
+
+.NOTES
+    Author      : Kamruzzaman Akib
+    Modules     : Microsoft.Graph.Authentication, Microsoft.Graph.Users,
+                  Microsoft.Graph.Identity.DirectoryManagement
+    Permissions : LicenseAssignment.ReadWrite.All, User.Read.All, Organization.Read.All (delegated)
+    Admin role  : License Administrator or User Administrator
+    The licence picker uses Out-GridView, which needs Windows.
+#&gt;
+#Requires -Modules Microsoft.Graph.Authentication, Microsoft.Graph.Users, Microsoft.Graph.Identity.DirectoryManagement
+
+[CmdletBinding(SupportsShouldProcess)]
+param(
+    [Parameter(Mandatory)]
+    [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
+    [string]$CsvPath
+)
+
+# --- Read and check the CSV -------------------------------------------------
+$rows = @(Import-Csv -Path $CsvPath)
+if ($rows.Count -eq 0) {
+    throw &quot;The CSV file &#x27;$CsvPath&#x27; is empty.&quot;
+}
+$upnColumn = $rows[0].PSObject.Properties.Name |
+    Where-Object { $_ -in &#x27;UPN&#x27;, &#x27;UserPrincipalName&#x27; } |
+    Select-Object -First 1
+if (-not $upnColumn) {
+    throw &#x27;The CSV file needs a column named UPN or UserPrincipalName.&#x27;
+}
+
+# --- Connect to Microsoft Graph ---------------------------------------------
+Connect-MgGraph -Scopes &#x27;LicenseAssignment.ReadWrite.All&#x27;, &#x27;User.Read.All&#x27;, &#x27;Organization.Read.All&#x27; -NoWelcome -ErrorAction Stop
+
+# --- Pick the licence --------------------------------------------------------
+$sku = Get-MgSubscribedSku -ErrorAction Stop |
+    Select-Object SkuPartNumber, SkuId, ConsumedUnits,
+        @{ Name = &#x27;Available&#x27;; Expression = { $_.PrepaidUnits.Enabled - $_.ConsumedUnits } } |
+    Out-GridView -Title &#x27;Select the licence to assign&#x27; -OutputMode Single
+
+if (-not $sku) {
+    Write-Warning &#x27;No licence selected. Nothing was changed.&#x27;
+    return
+}
+Write-Host &quot;Selected licence: $($sku.SkuPartNumber) ($($sku.SkuId))&quot; -ForegroundColor Cyan
+
+# --- Assign the licence to each user ----------------------------------------
+$assigned = 0; $skipped = 0; $failed = 0
+
+foreach ($row in $rows) {
+    $upn = &quot;$($row.$upnColumn)&quot;.Trim()
+    if (-not $upn) { continue }
+
+    try {
+        $user = Get-MgUser -UserId $upn -Property Id, UserPrincipalName, UsageLocation, AssignedLicenses -ErrorAction Stop
+    } catch {
+        Write-Warning &quot;$upn : could not find or read this user. $($_.Exception.Message)&quot;
+        $failed++
+        continue
+    }
+
+    if ($user.AssignedLicenses.SkuId -contains $sku.SkuId) {
+        Write-Host &quot;$upn already has $($sku.SkuPartNumber). Skipped.&quot; -ForegroundColor DarkGray
+        $skipped++
+        continue
+    }
+
+    if (-not $user.UsageLocation) {
+        Write-Warning &quot;$upn has no usage location, so a licence cannot be assigned. Set one and run the script again.&quot;
+        $skipped++
+        continue
+    }
+
+    if ($PSCmdlet.ShouldProcess($upn, &quot;Assign licence $($sku.SkuPartNumber)&quot;)) {
+        $body = @{
+            addLicenses    = @(@{ skuId = $sku.SkuId })
+            removeLicenses = @()
+        } | ConvertTo-Json -Depth 5
+
+        try {
+            Invoke-MgGraphRequest -Method POST -Uri &quot;https://graph.microsoft.com/v1.0/users/$($user.Id)/assignLicense&quot; `
+                -Body $body -ContentType &#x27;application/json&#x27; -ErrorAction Stop | Out-Null
+            Write-Host &quot;$upn : assigned $($sku.SkuPartNumber)&quot; -ForegroundColor Green
+            $assigned++
+        } catch {
+            Write-Warning &quot;$upn : could not assign the licence. $($_.Exception.Message)&quot;
+            $failed++
+        }
+    }
+}
+
+Write-Host &#x27;&#x27;
+Write-Host &quot;Done. Assigned: $assigned   Skipped: $skipped   Failed: $failed&quot; -ForegroundColor Cyan</code></pre></details>
+        </article><article class="script-entry reveal" id="remove-licensesfromcsv">
+          <div class="script-entry-head">
+            <div>
+              <code class="script-file">Remove-LicensesFromCsv.ps1</code>
+              <h3>Bulk remove a Microsoft 365 licence from a CSV</h3>
+            </div>
+            <div class="script-actions">
+              <a class="btn btn-primary btn-small" href="Remove-LicensesFromCsv.ps1" download>Download</a>
+              <a class="btn btn-outline btn-small" href="../articles/bulk-assign-m365-licences.html">Read the guide</a>
+            </div>
+          </div>
+          <p>The reverse: removes the chosen licence from every user in the CSV. It spots licences that come from group-based licensing and tells you instead of failing. I used this approach to reclaim hundreds of licences after a tenant integration.</p>
+          <p class="script-meta"><strong>Graph permissions:</strong> <code>LicenseAssignment.ReadWrite.All</code>, <code>User.Read.All</code>, <code>Organization.Read.All</code><br><strong>Admin role:</strong> License Administrator or User Administrator</p>
+          <details><summary>View the code (118 lines)</summary><pre><code class="lang-powershell">&lt;#
+.SYNOPSIS
+    Removes one Microsoft 365 licence from every user listed in a CSV file.
+
+.DESCRIPTION
+    Reads user principal names (UPNs) from a CSV file, lets you pick a licence (SKU)
+    from the tenant in a grid, then removes it from each user who has it.
+
+    Users who do not have the licence are skipped. Licences that a user gets through
+    group-based licensing cannot be removed one user at a time, so those users are
+    skipped with a message: remove them from the licensing group instead.
+
+    Run it with -WhatIf first to see what would change without changing anything.
+
+.PARAMETER CsvPath
+    Path to the CSV file. It needs a column named UPN (or UserPrincipalName).
+
+.EXAMPLE
+    .\Remove-LicensesFromCsv.ps1 -CsvPath .\leavers.csv -WhatIf
+    Dry run: shows which users would lose the licence.
+
+.EXAMPLE
+    .\Remove-LicensesFromCsv.ps1 -CsvPath .\leavers.csv
+    Removes the licence you pick from every user in leavers.csv.
+
+.NOTES
+    Author      : Kamruzzaman Akib
+    Modules     : Microsoft.Graph.Authentication, Microsoft.Graph.Users,
+                  Microsoft.Graph.Identity.DirectoryManagement
+    Permissions : LicenseAssignment.ReadWrite.All, User.Read.All, Organization.Read.All (delegated)
+    Admin role  : License Administrator or User Administrator
+    The licence picker uses Out-GridView, which needs Windows.
+#&gt;
+#Requires -Modules Microsoft.Graph.Authentication, Microsoft.Graph.Users, Microsoft.Graph.Identity.DirectoryManagement
+
+[CmdletBinding(SupportsShouldProcess)]
+param(
+    [Parameter(Mandatory)]
+    [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
+    [string]$CsvPath
+)
+
+# --- Read and check the CSV -------------------------------------------------
+$rows = @(Import-Csv -Path $CsvPath)
+if ($rows.Count -eq 0) {
+    throw &quot;The CSV file &#x27;$CsvPath&#x27; is empty.&quot;
+}
+$upnColumn = $rows[0].PSObject.Properties.Name |
+    Where-Object { $_ -in &#x27;UPN&#x27;, &#x27;UserPrincipalName&#x27; } |
+    Select-Object -First 1
+if (-not $upnColumn) {
+    throw &#x27;The CSV file needs a column named UPN or UserPrincipalName.&#x27;
+}
+
+# --- Connect to Microsoft Graph ---------------------------------------------
+Connect-MgGraph -Scopes &#x27;LicenseAssignment.ReadWrite.All&#x27;, &#x27;User.Read.All&#x27;, &#x27;Organization.Read.All&#x27; -NoWelcome -ErrorAction Stop
+
+# --- Pick the licence --------------------------------------------------------
+$sku = Get-MgSubscribedSku -ErrorAction Stop |
+    Select-Object SkuPartNumber, SkuId, ConsumedUnits,
+        @{ Name = &#x27;Available&#x27;; Expression = { $_.PrepaidUnits.Enabled - $_.ConsumedUnits } } |
+    Out-GridView -Title &#x27;Select the licence to remove&#x27; -OutputMode Single
+
+if (-not $sku) {
+    Write-Warning &#x27;No licence selected. Nothing was changed.&#x27;
+    return
+}
+Write-Host &quot;Selected licence: $($sku.SkuPartNumber) ($($sku.SkuId))&quot; -ForegroundColor Cyan
+
+# --- Remove the licence from each user --------------------------------------
+$removed = 0; $skipped = 0; $failed = 0
+
+foreach ($row in $rows) {
+    $upn = &quot;$($row.$upnColumn)&quot;.Trim()
+    if (-not $upn) { continue }
+
+    try {
+        $user = Get-MgUser -UserId $upn -Property Id, UserPrincipalName, AssignedLicenses, LicenseAssignmentStates -ErrorAction Stop
+    } catch {
+        Write-Warning &quot;$upn : could not find or read this user. $($_.Exception.Message)&quot;
+        $failed++
+        continue
+    }
+
+    if ($user.AssignedLicenses.SkuId -notcontains $sku.SkuId) {
+        Write-Host &quot;$upn does not have $($sku.SkuPartNumber). Skipped.&quot; -ForegroundColor DarkGray
+        $skipped++
+        continue
+    }
+
+    # A licence that only comes from a group cannot be removed from the user directly.
+    $states = @($user.LicenseAssignmentStates | Where-Object { $_.SkuId -eq $sku.SkuId })
+    if ($states.Count -gt 0 -and -not ($states | Where-Object { -not $_.AssignedByGroup })) {
+        Write-Warning &quot;$upn gets $($sku.SkuPartNumber) from a group. Remove the user from that group instead.&quot;
+        $skipped++
+        continue
+    }
+
+    if ($PSCmdlet.ShouldProcess($upn, &quot;Remove licence $($sku.SkuPartNumber)&quot;)) {
+        $body = @{
+            addLicenses    = @()
+            removeLicenses = @($sku.SkuId)
+        } | ConvertTo-Json -Depth 5
+
+        try {
+            Invoke-MgGraphRequest -Method POST -Uri &quot;https://graph.microsoft.com/v1.0/users/$($user.Id)/assignLicense&quot; `
+                -Body $body -ContentType &#x27;application/json&#x27; -ErrorAction Stop | Out-Null
+            Write-Host &quot;$upn : removed $($sku.SkuPartNumber)&quot; -ForegroundColor Green
+            $removed++
+        } catch {
+            Write-Warning &quot;$upn : could not remove the licence. $($_.Exception.Message)&quot;
+            $failed++
+        }
+    }
+}
+
+Write-Host &#x27;&#x27;
+Write-Host &quot;Done. Removed: $removed   Skipped: $skipped   Failed: $failed&quot; -ForegroundColor Cyan</code></pre></details>
+        </article>
+        </div>
+        <h2 class="cat-title">Intune &amp; BitLocker</h2>
+        <div class="script-list">
+        <article class="script-entry reveal" id="export-bitlockerkeys">
+          <div class="script-entry-head">
+            <div>
+              <code class="script-file">Export-BitLockerKeys.ps1</code>
+              <h3>Export every BitLocker recovery key, with device names</h3>
+            </div>
+            <div class="script-actions">
+              <a class="btn btn-primary btn-small" href="Export-BitLockerKeys.ps1" download>Download</a>
+              <a class="btn btn-outline btn-small" href="../articles/export-bitlocker-keys.html">Read the guide</a>
+            </div>
+          </div>
+          <p>Pulls every recovery key stored in Entra ID into one CSV and matches each to a device name from Intune, falling back to Entra ID. Warns about keys it couldn’t read and reminds you to store the file securely.</p>
+          <p class="script-meta"><strong>Graph permissions:</strong> <code>BitlockerKey.Read.All</code>, <code>DeviceManagementManagedDevices.Read.All</code>, <code>Device.Read.All</code><br><strong>Admin role:</strong> Cloud Device Administrator, Helpdesk Administrator, Intune Administrator, Security Administrator, Security Reader or Global Reader</p>
+          <details><summary>View the code (104 lines)</summary><pre><code class="lang-powershell">&lt;#
+.SYNOPSIS
+    Exports every BitLocker recovery key stored in Microsoft Entra ID to a CSV file,
+    with the device name next to each key.
+
+.DESCRIPTION
+    The Intune and Entra admin centres show recovery keys one device at a time.
+    This script lists every BitLocker recovery key backed up to Microsoft Entra ID,
+    reads each key, and matches it to a device name: first from Intune managed
+    devices, then from Entra ID devices for anything Intune no longer manages.
+
+    Every key that is read is recorded in the Entra ID audit log (KeyManagement).
+    The output file contains recovery keys: store it somewhere secure, limit who
+    can open it, and delete it when you no longer need it.
+
+.PARAMETER OutputPath
+    Where to save the CSV file. Default: BitLockerKeys-&lt;date&gt;.csv in your Documents folder.
+
+.EXAMPLE
+    .\Export-BitLockerKeys.ps1
+
+.EXAMPLE
+    .\Export-BitLockerKeys.ps1 -OutputPath &#x27;D:\Secure\BitLockerKeys.csv&#x27;
+
+.NOTES
+    Author      : Kamruzzaman Akib
+    Modules     : Microsoft.Graph.Authentication, Microsoft.Graph.Identity.SignIns,
+                  Microsoft.Graph.DeviceManagement, Microsoft.Graph.Identity.DirectoryManagement
+    Permissions : BitlockerKey.Read.All, DeviceManagementManagedDevices.Read.All, Device.Read.All (delegated)
+    Admin role  : one of Cloud Device Administrator, Helpdesk Administrator, Intune Administrator,
+                  Security Administrator, Security Reader or Global Reader
+#&gt;
+#Requires -Modules Microsoft.Graph.Authentication, Microsoft.Graph.Identity.SignIns, Microsoft.Graph.DeviceManagement, Microsoft.Graph.Identity.DirectoryManagement
+
+[CmdletBinding()]
+param(
+    [string]$OutputPath = (Join-Path -Path ([Environment]::GetFolderPath(&#x27;MyDocuments&#x27;)) -ChildPath (&#x27;BitLockerKeys-{0:yyyy-MM-dd}.csv&#x27; -f (Get-Date)))
+)
+
+Connect-MgGraph -Scopes &#x27;BitlockerKey.Read.All&#x27;, &#x27;DeviceManagementManagedDevices.Read.All&#x27;, &#x27;Device.Read.All&#x27; -NoWelcome -ErrorAction Stop
+
+# --- 1. Build a lookup table: Entra device ID -&gt; device name -----------------
+$deviceNames = @{}
+
+Write-Host &#x27;Reading Intune managed devices...&#x27; -ForegroundColor Cyan
+try {
+    Get-MgDeviceManagementManagedDevice -All -Property DeviceName, AzureADDeviceId -ErrorAction Stop |
+        Where-Object { $_.AzureADDeviceId -and $_.AzureADDeviceId -ne &#x27;00000000-0000-0000-0000-000000000000&#x27; } |
+        ForEach-Object { $deviceNames[$_.AzureADDeviceId] = $_.DeviceName }
+} catch {
+    Write-Warning &quot;Could not read Intune devices: $($_.Exception.Message)&quot;
+}
+
+Write-Host &#x27;Reading Entra ID devices...&#x27; -ForegroundColor Cyan
+try {
+    Get-MgDevice -All -Property DeviceId, DisplayName -ErrorAction Stop |
+        Where-Object { $_.DeviceId -and -not $deviceNames.ContainsKey($_.DeviceId) } |
+        ForEach-Object { $deviceNames[$_.DeviceId] = $_.DisplayName }
+} catch {
+    Write-Warning &quot;Could not read Entra ID devices: $($_.Exception.Message)&quot;
+}
+Write-Host &quot;Found names for $($deviceNames.Count) devices.&quot; -ForegroundColor Green
+
+# --- 2. List every recovery key, then read each key value --------------------
+$keys = @(Get-MgInformationProtectionBitlockerRecoveryKey -All -ErrorAction Stop)
+Write-Host &quot;Found $($keys.Count) recovery keys. Reading each one...&quot; -ForegroundColor Cyan
+
+$i = 0
+$results = foreach ($k in $keys) {
+    $i++
+    Write-Progress -Activity &#x27;Reading BitLocker recovery keys&#x27; -Status &quot;$i of $($keys.Count)&quot; -PercentComplete (100 * $i / $keys.Count)
+
+    $recoveryKey = $null
+    try {
+        # The key value is only returned when it is asked for explicitly.
+        $recoveryKey = (Get-MgInformationProtectionBitlockerRecoveryKey -BitlockerRecoveryKeyId $k.Id -Property key -ErrorAction Stop).Key
+    } catch {
+        Write-Warning &quot;Could not read key $($k.Id) (device $($k.DeviceId)): $($_.Exception.Message)&quot;
+    }
+
+    [PSCustomObject]@{
+        DeviceName  = if ($k.DeviceId -and $deviceNames.ContainsKey($k.DeviceId)) { $deviceNames[$k.DeviceId] } else { &#x27;Unknown device&#x27; }
+        DeviceId    = $k.DeviceId
+        KeyId       = $k.Id
+        VolumeType  = $k.VolumeType
+        Created     = $k.CreatedDateTime
+        RecoveryKey = $recoveryKey
+    }
+}
+Write-Progress -Activity &#x27;Reading BitLocker recovery keys&#x27; -Completed
+
+# --- 3. Save the results ------------------------------------------------------
+$folder = Split-Path -Path $OutputPath -Parent
+if ($folder -and -not (Test-Path -Path $folder)) {
+    New-Item -Path $folder -ItemType Directory | Out-Null
+}
+$results | Sort-Object DeviceName, Created | Export-Csv -Path $OutputPath -NoTypeInformation -Encoding UTF8
+
+$missing = @($results | Where-Object { -not $_.RecoveryKey }).Count
+Write-Host &quot;Saved $($results.Count) keys to $OutputPath&quot; -ForegroundColor Green
+if ($missing -gt 0) {
+    Write-Warning &quot;$missing keys could not be read. Check that your account has one of the admin roles listed in the notes.&quot;
+}
+Write-Warning &#x27;This file contains BitLocker recovery keys. Keep it somewhere secure and delete it when you are done.&#x27;</code></pre></details>
+        </article>
+        </div>
+        <h2 class="cat-title">Entra ID groups</h2>
+        <div class="script-list">
+        <article class="script-entry reveal" id="get-usergroupmembership">
+          <div class="script-entry-head">
+            <div>
+              <code class="script-file">Get-UserGroupMembership.ps1</code>
+              <h3>List every group a user belongs to</h3>
+            </div>
+            <div class="script-actions">
+              <a class="btn btn-primary btn-small" href="Get-UserGroupMembership.ps1" download>Download</a>
+              
+            </div>
+          </div>
+          <p>Answers “why can (or can’t) this person see that?”. Lists a user’s groups with the type of each one (security, Microsoft 365, distribution list or mail-enabled security) and whether membership is dynamic. Add -Transitive for nested groups and -OutputPath to save a CSV.</p>
+          <p class="script-meta"><strong>Graph permissions:</strong> <code>User.Read.All</code>, <code>GroupMember.Read.All</code><br><strong>Admin role:</strong> Any admin role that can read users and groups, such as Global Reader</p>
+          <details><summary>View the code (98 lines)</summary><pre><code class="lang-powershell">&lt;#
+.SYNOPSIS
+    Lists the groups a user belongs to in Microsoft Entra ID, with the type of each group.
+
+.DESCRIPTION
+    Useful when you need to know why someone has, or doesn&#x27;t have, access to an app,
+    a policy or a mailbox. For each group it shows the name, the type (security,
+    Microsoft 365, distribution list or mail-enabled security), whether membership is
+    dynamic, and the group ID.
+
+    By default it lists direct memberships. Add -Transitive to include groups the user
+    is in through another group (nested groups).
+
+.PARAMETER UserPrincipalName
+    The user to look up. You are asked for it if you leave it out.
+
+.PARAMETER Transitive
+    Include nested group memberships.
+
+.PARAMETER OutputPath
+    Optional. Also saves the list to this CSV file.
+
+.EXAMPLE
+    .\Get-UserGroupMembership.ps1 -UserPrincipalName alex.wilber@contoso.com
+
+.EXAMPLE
+    .\Get-UserGroupMembership.ps1 alex.wilber@contoso.com -Transitive -OutputPath .\alex-groups.csv
+
+.NOTES
+    Author      : Kamruzzaman Akib
+    Module      : Microsoft.Graph.Authentication
+    Permissions : User.Read.All, GroupMember.Read.All (delegated)
+    Directory roles and administrative units are left out; only groups are listed.
+#&gt;
+#Requires -Modules Microsoft.Graph.Authentication
+
+[CmdletBinding()]
+param(
+    [Parameter(Mandatory, Position = 0)]
+    [string]$UserPrincipalName,
+
+    [switch]$Transitive,
+
+    [string]$OutputPath
+)
+
+Connect-MgGraph -Scopes &#x27;User.Read.All&#x27;, &#x27;GroupMember.Read.All&#x27; -NoWelcome -ErrorAction Stop
+
+try {
+    # --- Find the user -------------------------------------------------------
+    $id = [uri]::EscapeDataString($UserPrincipalName)
+    try {
+        $user = Invoke-MgGraphRequest -Method GET -Uri &quot;/v1.0/users/$($id)?`$select=id,displayName,userPrincipalName&quot; -ErrorAction Stop
+    }
+    catch {
+        throw &quot;User &#x27;$UserPrincipalName&#x27; was not found. $($_.Exception.Message)&quot;
+    }
+
+    # --- Read every page of memberships --------------------------------------
+    $relation = if ($Transitive) { &#x27;transitiveMemberOf&#x27; } else { &#x27;memberOf&#x27; }
+    $uri      = &quot;/v1.0/users/$($user.id)/$($relation)?`$top=999&quot;
+    $groups   = [System.Collections.Generic.List[object]]::new()
+
+    while ($uri) {
+        $page = Invoke-MgGraphRequest -Method GET -Uri $uri -ErrorAction Stop
+        foreach ($entry in $page.value) {
+            if ($entry.&#x27;@odata.type&#x27; -eq &#x27;#microsoft.graph.group&#x27;) { $groups.Add($entry) }
+        }
+        $uri = $page.&#x27;@odata.nextLink&#x27;
+    }
+
+    # --- Describe each group -------------------------------------------------
+    $result = foreach ($g in $groups) {
+        $kind = if ($g.groupTypes -contains &#x27;Unified&#x27;)           { &#x27;Microsoft 365&#x27; }
+                elseif ($g.mailEnabled -and $g.securityEnabled)  { &#x27;Mail-enabled security&#x27; }
+                elseif ($g.mailEnabled)                          { &#x27;Distribution list&#x27; }
+                else                                             { &#x27;Security&#x27; }
+        [PSCustomObject]@{
+            Group      = $g.displayName
+            Type       = $kind
+            Membership = if ($g.groupTypes -contains &#x27;DynamicMembership&#x27;) { &#x27;Dynamic&#x27; } else { &#x27;Assigned&#x27; }
+            GroupId    = $g.id
+        }
+    }
+    $result = @($result | Sort-Object Group)
+
+    $scope = if ($Transitive) { &#x27;direct and nested&#x27; } else { &#x27;direct&#x27; }
+    Write-Host &quot;$($user.displayName) ($($user.userPrincipalName)) is a $scope member of $($result.Count) groups.&quot; -ForegroundColor Cyan
+    $result | Format-Table -AutoSize
+
+    if ($OutputPath) {
+        $result | Export-Csv -Path $OutputPath -NoTypeInformation -Encoding UTF8
+        Write-Host &quot;Saved to $((Resolve-Path -Path $OutputPath).Path)&quot; -ForegroundColor Green
+    }
+}
+finally {
+    Disconnect-MgGraph | Out-Null
+}</code></pre></details>
+        </article><article class="script-entry reveal" id="export-entragroups">
+          <div class="script-entry-head">
+            <div>
+              <code class="script-file">Export-EntraGroups.ps1</code>
+              <h3>Export Entra ID groups to CSV</h3>
+            </div>
+            <div class="script-actions">
+              <a class="btn btn-primary btn-small" href="Export-EntraGroups.ps1" download>Download</a>
+              <a class="btn btn-outline btn-small" href="../articles/copy-entra-groups-between-tenants.html">Read the guide</a>
+            </div>
+          </div>
+          <p>First half of a tenant-to-tenant group copy: saves each group’s name, description, mail nickname, type, visibility and dynamic membership rule.</p>
+          <p class="script-meta"><strong>Graph permissions:</strong> <code>Group.Read.All</code><br><strong>Admin role:</strong> Any admin role that can read groups, such as Global Reader</p>
+          <details><summary>View the code (57 lines)</summary><pre><code class="lang-powershell">&lt;#
+.SYNOPSIS
+    Exports Microsoft Entra ID groups (the groups Intune apps and policies are assigned to)
+    to a CSV file, so they can be recreated in another tenant.
+
+.DESCRIPTION
+    First half of a tenant-to-tenant group copy. For each group it saves the name,
+    description, mail nickname, group type, visibility and, for dynamic groups, the
+    membership rule. Import-EntraGroups.ps1 reads this file in the destination tenant.
+
+    Members, owners and assignments are not exported.
+
+.PARAMETER OutputPath
+    Where to save the CSV file. Default: groups.csv in the current folder.
+
+.EXAMPLE
+    .\Export-EntraGroups.ps1 -OutputPath .\groups.csv
+
+.NOTES
+    Author      : Kamruzzaman Akib
+    Modules     : Microsoft.Graph.Authentication, Microsoft.Graph.Groups
+    Permissions : Group.Read.All (delegated)
+    Sign in to the SOURCE tenant when prompted.
+#&gt;
+#Requires -Modules Microsoft.Graph.Authentication, Microsoft.Graph.Groups
+
+[CmdletBinding()]
+param(
+    [string]$OutputPath = &#x27;.\groups.csv&#x27;
+)
+
+Connect-MgGraph -Scopes &#x27;Group.Read.All&#x27; -NoWelcome -ErrorAction Stop
+Write-Host &quot;Connected to tenant $((Get-MgContext).TenantId)&quot; -ForegroundColor Cyan
+
+$properties = &#x27;Id&#x27;, &#x27;DisplayName&#x27;, &#x27;Description&#x27;, &#x27;MailNickname&#x27;, &#x27;MailEnabled&#x27;, &#x27;SecurityEnabled&#x27;,
+              &#x27;GroupTypes&#x27;, &#x27;Visibility&#x27;, &#x27;MembershipRule&#x27;, &#x27;MembershipRuleProcessingState&#x27;
+
+$groups = @(Get-MgGroup -All -Property $properties -ErrorAction Stop)
+
+$groups | ForEach-Object {
+    [PSCustomObject]@{
+        ObjectId                      = $_.Id
+        DisplayName                   = $_.DisplayName
+        Description                   = $_.Description
+        MailNickname                  = $_.MailNickname
+        MailEnabled                   = $_.MailEnabled
+        SecurityEnabled               = $_.SecurityEnabled
+        GroupTypes                    = $_.GroupTypes -join &#x27;;&#x27;
+        Visibility                    = $_.Visibility
+        MembershipRule                = $_.MembershipRule
+        MembershipRuleProcessingState = $_.MembershipRuleProcessingState
+    }
+} | Export-Csv -Path $OutputPath -NoTypeInformation -Encoding UTF8
+
+Write-Host &quot;Exported $($groups.Count) groups to $((Resolve-Path -Path $OutputPath).Path)&quot; -ForegroundColor Green
+
+Disconnect-MgGraph | Out-Null</code></pre></details>
+        </article><article class="script-entry reveal" id="import-entragroups">
+          <div class="script-entry-head">
+            <div>
+              <code class="script-file">Import-EntraGroups.ps1</code>
+              <h3>Recreate Entra ID groups in another tenant</h3>
+            </div>
+            <div class="script-actions">
+              <a class="btn btn-primary btn-small" href="Import-EntraGroups.ps1" download>Download</a>
+              <a class="btn btn-outline btn-small" href="../articles/copy-entra-groups-between-tenants.html">Read the guide</a>
+            </div>
+          </div>
+          <p>Second half: recreates security and Microsoft 365 groups from the CSV, skips names that already exist and anything Graph can’t create, and saves an old-to-new group ID map for re-pointing assignments.</p>
+          <p class="script-meta"><strong>Graph permissions:</strong> <code>Group.ReadWrite.All</code><br><strong>Admin role:</strong> Groups Administrator</p>
+          <details><summary>View the code (124 lines)</summary><pre><code class="lang-powershell">&lt;#
+.SYNOPSIS
+    Recreates Microsoft Entra ID groups from a CSV made by Export-EntraGroups.ps1.
+
+.DESCRIPTION
+    Second half of a tenant-to-tenant group copy. Run it while signed in to the
+    DESTINATION tenant. For each row it creates a security group or Microsoft 365
+    group with the same name, description, mail nickname, visibility and (for
+    dynamic groups) membership rule.
+
+    It skips:
+      - groups whose name already exists in the destination tenant, so the script
+        is safe to run again;
+      - distribution lists and mail-enabled security groups, because Microsoft Graph
+        cannot create them (create them in Exchange Online instead).
+
+    It also writes &lt;CsvPath&gt;-id-map.csv with the old and new group IDs, which helps
+    when you recreate Intune assignments.
+
+    Run it with -WhatIf first to see what would be created.
+
+.PARAMETER CsvPath
+    Path to the CSV file created by Export-EntraGroups.ps1.
+
+.EXAMPLE
+    .\Import-EntraGroups.ps1 -CsvPath .\groups.csv -WhatIf
+
+.EXAMPLE
+    .\Import-EntraGroups.ps1 -CsvPath .\groups.csv
+
+.NOTES
+    Author      : Kamruzzaman Akib
+    Modules     : Microsoft.Graph.Authentication, Microsoft.Graph.Groups
+    Permissions : Group.ReadWrite.All (delegated)
+    Members and owners are not copied.
+#&gt;
+#Requires -Modules Microsoft.Graph.Authentication, Microsoft.Graph.Groups
+
+[CmdletBinding(SupportsShouldProcess)]
+param(
+    [Parameter(Mandatory)]
+    [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
+    [string]$CsvPath
+)
+
+$rows = @(Import-Csv -Path $CsvPath)
+if ($rows.Count -eq 0) {
+    throw &quot;The CSV file &#x27;$CsvPath&#x27; is empty.&quot;
+}
+
+Connect-MgGraph -Scopes &#x27;Group.ReadWrite.All&#x27; -NoWelcome -ErrorAction Stop
+Write-Host &quot;Connected to tenant $((Get-MgContext).TenantId)&quot; -ForegroundColor Cyan
+
+$created = 0; $skipped = 0; $failed = 0
+$idMap = New-Object System.Collections.Generic.List[object]
+
+foreach ($row in $rows) {
+    $name = $row.DisplayName
+    if (-not $name) { continue }
+
+    $groupTypes      = @($row.GroupTypes -split &#x27;;&#x27; | Where-Object { $_ })
+    $mailEnabled     = ($row.MailEnabled -eq &#x27;True&#x27;)
+    $securityEnabled = ($row.SecurityEnabled -eq &#x27;True&#x27;)
+
+    # Microsoft Graph can only create Microsoft 365 groups and security groups.
+    if ($mailEnabled -and ($groupTypes -notcontains &#x27;Unified&#x27;)) {
+        Write-Warning &quot;Skipped &#x27;$name&#x27;: distribution lists and mail-enabled security groups must be created in Exchange Online.&quot;
+        $skipped++
+        continue
+    }
+
+    # Do not create a second group with the same name.
+    $filterName = $name -replace &quot;&#x27;&quot;, &quot;&#x27;&#x27;&quot;
+    $existing = Get-MgGroup -Filter &quot;displayName eq &#x27;$filterName&#x27;&quot; -Top 1 -ErrorAction SilentlyContinue
+    if ($existing) {
+        Write-Host &quot;Skipped &#x27;$name&#x27;: a group with this name already exists.&quot; -ForegroundColor DarkGray
+        $skipped++
+        continue
+    }
+
+    # Mail nickname is required. Make one from the name if the CSV has none.
+    $mailNickname = $row.MailNickname
+    if (-not $mailNickname) {
+        $mailNickname = ($name -replace &#x27;[^a-zA-Z0-9]&#x27;, &#x27;&#x27;)
+        if (-not $mailNickname) { $mailNickname = &#x27;group&#x27; + (Get-Random -Maximum 999999) }
+    }
+
+    $params = @{
+        DisplayName     = $name
+        MailNickname    = $mailNickname
+        MailEnabled     = $mailEnabled
+        SecurityEnabled = $securityEnabled
+    }
+    if ($groupTypes.Count -gt 0) { $params.GroupTypes = $groupTypes }
+    if ($row.Description -and $row.Description -ne &#x27;.&#x27;) { $params.Description = $row.Description }
+    if ($row.Visibility) { $params.Visibility = $row.Visibility }
+    if ($row.MembershipRule) {
+        $params.MembershipRule = $row.MembershipRule
+        $params.MembershipRuleProcessingState = if ($row.MembershipRuleProcessingState) { $row.MembershipRuleProcessingState } else { &#x27;On&#x27; }
+    }
+
+    if ($PSCmdlet.ShouldProcess($name, &#x27;Create group&#x27;)) {
+        try {
+            $newGroup = New-MgGroup @params -ErrorAction Stop
+            Write-Host &quot;Created &#x27;$name&#x27; ($($newGroup.Id))&quot; -ForegroundColor Green
+            $idMap.Add([PSCustomObject]@{ DisplayName = $name; OldId = $row.ObjectId; NewId = $newGroup.Id })
+            $created++
+        } catch {
+            Write-Warning &quot;Failed to create &#x27;$name&#x27;: $($_.Exception.Message)&quot;
+            $failed++
+        }
+    }
+}
+
+if ($idMap.Count -gt 0) {
+    $mapPath = [System.IO.Path]::ChangeExtension((Resolve-Path -Path $CsvPath).Path, $null).TrimEnd(&#x27;.&#x27;) + &#x27;-id-map.csv&#x27;
+    $idMap | Export-Csv -Path $mapPath -NoTypeInformation -Encoding UTF8
+    Write-Host &quot;Old and new group IDs saved to $mapPath&quot; -ForegroundColor Cyan
+}
+
+Write-Host &#x27;&#x27;
+Write-Host &quot;Done. Created: $created   Skipped: $skipped   Failed: $failed&quot; -ForegroundColor Cyan
+
+Disconnect-MgGraph | Out-Null</code></pre></details>
+        </article><article class="script-entry reveal" id="remove-entragroup">
+          <div class="script-entry-head">
+            <div>
+              <code class="script-file">Remove-EntraGroup.ps1</code>
+              <h3>Delete a group by ID, with a confirmation</h3>
+            </div>
+            <div class="script-actions">
+              <a class="btn btn-primary btn-small" href="Remove-EntraGroup.ps1" download>Download</a>
+              <a class="btn btn-outline btn-small" href="../articles/copy-entra-groups-between-tenants.html">Read the guide</a>
+            </div>
+          </div>
+          <p>Looks the group up, shows its name and asks before deleting it. Handy for cleaning up after a test import; -Force skips the prompt for loops.</p>
+          <p class="script-meta"><strong>Graph permissions:</strong> <code>Group.ReadWrite.All</code><br><strong>Admin role:</strong> Groups Administrator</p>
+          <details><summary>View the code (64 lines)</summary><pre><code class="lang-powershell">&lt;#
+.SYNOPSIS
+    Deletes a Microsoft Entra ID group by its object ID.
+
+.DESCRIPTION
+    Handy for cleaning up after a test import, or for removing a group straight
+    through Microsoft Graph when the admin centre is slow or unhelpful.
+    It looks the group up first, shows its name and asks you to confirm.
+    Use -Force to skip the confirmation prompt (for example, in a loop).
+
+    Microsoft 365 groups can be restored for 30 days after deletion.
+    Treat any other group type as permanently deleted.
+
+.PARAMETER GroupId
+    Object ID of the group, as shown in the Entra or Intune admin centre.
+
+.PARAMETER Force
+    Delete without asking for confirmation.
+
+.EXAMPLE
+    .\Remove-EntraGroup.ps1 -GroupId 3f2a6b1c-0d4e-4f5a-9b8c-7d6e5f4a3b2c
+
+.EXAMPLE
+    .\Remove-EntraGroup.ps1 -GroupId 3f2a6b1c-0d4e-4f5a-9b8c-7d6e5f4a3b2c -WhatIf
+
+.NOTES
+    Author      : Kamruzzaman Akib
+    Modules     : Microsoft.Graph.Authentication, Microsoft.Graph.Groups
+    Permissions : Group.ReadWrite.All (delegated)
+#&gt;
+#Requires -Modules Microsoft.Graph.Authentication, Microsoft.Graph.Groups
+
+[CmdletBinding(SupportsShouldProcess, ConfirmImpact = &#x27;High&#x27;)]
+param(
+    [Parameter(Mandatory, HelpMessage = &#x27;Object ID of the group to delete&#x27;)]
+    [ValidatePattern(&#x27;^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$&#x27;)]
+    [string]$GroupId,
+
+    [switch]$Force
+)
+
+if ($Force -and -not $PSBoundParameters.ContainsKey(&#x27;Confirm&#x27;)) {
+    $ConfirmPreference = &#x27;None&#x27;
+}
+
+Connect-MgGraph -Scopes &#x27;Group.ReadWrite.All&#x27; -NoWelcome -ErrorAction Stop
+
+try {
+    $group = Get-MgGroup -GroupId $GroupId -Property Id, DisplayName, GroupTypes -ErrorAction Stop
+} catch {
+    Write-Error &quot;No group found with ID $GroupId. $($_.Exception.Message)&quot;
+    return
+}
+
+$kind = if ($group.GroupTypes -contains &#x27;Unified&#x27;) { &#x27;Microsoft 365 group&#x27; } else { &#x27;group&#x27; }
+
+if ($PSCmdlet.ShouldProcess(&quot;$($group.DisplayName) ($GroupId)&quot;, &quot;Delete $kind&quot;)) {
+    try {
+        Remove-MgGroup -GroupId $GroupId -Confirm:$false -ErrorAction Stop
+        Write-Host &quot;Deleted $kind &#x27;$($group.DisplayName)&#x27; ($GroupId).&quot; -ForegroundColor Green
+    } catch {
+        Write-Error &quot;Could not delete &#x27;$($group.DisplayName)&#x27;: $($_.Exception.Message)&quot;
+    }
+}</code></pre></details>
+        </article>
+        </div>
+        <h2 class="cat-title">OneDrive &amp; SharePoint</h2>
+        <div class="script-list">
+        <article class="script-entry reveal" id="add-onedrivesiteadmin">
+          <div class="script-entry-head">
+            <div>
+              <code class="script-file">Add-OneDriveSiteAdmin.ps1</code>
+              <h3>Give yourself (and later remove) admin access to every OneDrive</h3>
+            </div>
+            <div class="script-actions">
+              <a class="btn btn-primary btn-small" href="Add-OneDriveSiteAdmin.ps1" download>Download</a>
+              <a class="btn btn-outline btn-small" href="../articles/bulk-download-onedrive.html">Read the guide</a>
+            </div>
+          </div>
+          <p>Adds one account as Site Collection Administrator on every OneDrive in the tenant, so a migration export can read the files. Run it again with -Remove when the work is done. Supports -WhatIf and shows progress and a summary.</p>
+          <p class="script-meta"><strong>Module:</strong> SharePoint Online Management Shell (Windows PowerShell 5.1)<br><strong>Admin role:</strong> SharePoint Administrator or Global Administrator</p>
+          <details><summary>View the code (92 lines)</summary><pre><code class="lang-powershell">&lt;#
+.SYNOPSIS
+    Adds (or removes) one account as Site Collection Administrator on every OneDrive
+    in the tenant.
+
+.DESCRIPTION
+    Global and SharePoint administrators cannot open another user&#x27;s OneDrive until
+    they are a Site Collection Administrator on it. This script lists every OneDrive
+    (personal site) in the tenant and grants that right to one account, so a bulk
+    export such as Export-OneDriveFiles.ps1 can read the files.
+
+    When the export is finished, run it again with -Remove to take the access away.
+
+    Run it with -WhatIf first to see which OneDrives would change.
+
+.PARAMETER AdminUrl
+    Your SharePoint admin centre URL, for example https://contoso-admin.sharepoint.com
+
+.PARAMETER UserPrincipalName
+    The account to add (or remove) as Site Collection Administrator.
+
+.PARAMETER Remove
+    Removes the account as Site Collection Administrator instead of adding it.
+
+.EXAMPLE
+    .\Add-OneDriveSiteAdmin.ps1 -AdminUrl https://contoso-admin.sharepoint.com -UserPrincipalName admin@contoso.com -WhatIf
+    Dry run: lists the OneDrives that would change.
+
+.EXAMPLE
+    .\Add-OneDriveSiteAdmin.ps1 -AdminUrl https://contoso-admin.sharepoint.com -UserPrincipalName admin@contoso.com -Remove
+    Takes the access away again after the export.
+
+.NOTES
+    Author     : Kamruzzaman Akib
+    Module     : Microsoft.Online.SharePoint.PowerShell (run it in Windows PowerShell 5.1)
+    Admin role : SharePoint Administrator or Global Administrator
+    Access to personal files is sensitive. Get written approval first, and remove
+    the access as soon as the work is done.
+#&gt;
+#Requires -Modules Microsoft.Online.SharePoint.PowerShell
+
+[CmdletBinding(SupportsShouldProcess)]
+param(
+    [Parameter(Mandatory)]
+    [ValidatePattern(&#x27;^https://[\w-]+-admin\.sharepoint\.[a-z.]+/?$&#x27;)]
+    [string]$AdminUrl,
+
+    [Parameter(Mandatory)]
+    [string]$UserPrincipalName,
+
+    [switch]$Remove
+)
+
+Connect-SPOService -Url $AdminUrl -ErrorAction Stop
+
+Write-Host &#x27;Listing every OneDrive in the tenant. This can take a few minutes...&#x27; -ForegroundColor Cyan
+$sites = @(Get-SPOSite -IncludePersonalSite $true -Limit All -Filter &quot;Url -like &#x27;-my.sharepoint.com/personal/&#x27;&quot; -ErrorAction Stop)
+Write-Host &quot;Found $($sites.Count) OneDrives.&quot; -ForegroundColor Cyan
+
+$grant  = -not $Remove
+$action = if ($grant) { &#x27;Add as Site Collection Administrator&#x27; } else { &#x27;Remove as Site Collection Administrator&#x27; }
+$changed = 0
+$failed  = 0
+$i       = 0
+
+foreach ($site in $sites) {
+    $i++
+    Write-Progress -Activity $action -Status $site.Url -PercentComplete ($i / $sites.Count * 100)
+
+    if (-not $PSCmdlet.ShouldProcess($site.Url, &quot;$action ($UserPrincipalName)&quot;)) { continue }
+
+    try {
+        $null = Set-SPOUser -Site $site.Url -LoginName $UserPrincipalName -IsSiteCollectionAdmin $grant -ErrorAction Stop
+        $changed++
+        Write-Verbose &quot;Done: $($site.Url)&quot;
+    }
+    catch {
+        $failed++
+        Write-Warning &quot;Failed on $($site.Url): $($_.Exception.Message)&quot;
+    }
+}
+Write-Progress -Activity $action -Completed
+
+Write-Host &#x27;&#x27;
+Write-Host &quot;OneDrives found : $($sites.Count)&quot;
+Write-Host &quot;Changed         : $changed&quot; -ForegroundColor Green
+if ($failed) { Write-Host &quot;Failed          : $failed&quot; -ForegroundColor Red }
+if ($grant -and $changed) {
+    Write-Host &#x27;When the export is finished, run this again with -Remove to take the access away.&#x27; -ForegroundColor Yellow
+}
+
+Disconnect-SPOService</code></pre></details>
+        </article><article class="script-entry reveal" id="export-onedrivefiles">
+          <div class="script-entry-head">
+            <div>
+              <code class="script-file">Export-OneDriveFiles.ps1</code>
+              <h3>Download OneDrive files for one user, a CSV list or everyone</h3>
+            </div>
+            <div class="script-actions">
+              <a class="btn btn-primary btn-small" href="Export-OneDriveFiles.ps1" download>Download</a>
+              <a class="btn btn-outline btn-small" href="../articles/bulk-download-onedrive.html">Read the guide</a>
+            </div>
+          </div>
+          <p>Downloads every file and keeps the folder structure, one folder per user. Reads every page of large folders, skips files already downloaded so you can resume, and ends with a summary. Replaces my three earlier export scripts.</p>
+          <p class="script-meta"><strong>Graph permissions:</strong> <code>Files.Read.All</code>, <code>User.Read.All</code><br><strong>Admin role:</strong> SharePoint Administrator or Global Administrator, plus Site Collection Administrator on each OneDrive</p>
+          <details><summary>View the code (181 lines)</summary><pre><code class="lang-powershell">&lt;#
+.SYNOPSIS
+    Downloads users&#x27; OneDrive files to a local folder, keeping the folder structure.
+
+.DESCRIPTION
+    Built for a tenant migration, where every OneDrive had to be exported before the
+    old tenant was closed. Choose who to export in one of three ways:
+
+      -UserPrincipalName   one or more users
+      -CsvPath             a CSV file with a UserPrincipalName (or UPN) column
+      -AllUsers            every member account in the tenant (guests are skipped)
+
+    Each user&#x27;s files are saved to &lt;ExportPath&gt;\&lt;UPN&gt;\ with the same folders as in
+    OneDrive. Files that are already there with the same size are skipped, so you can
+    stop the script and run it again to carry on where it left off.
+
+    You must be Site Collection Administrator on each OneDrive first (see
+    Add-OneDriveSiteAdmin.ps1), otherwise that OneDrive is reported as not accessible.
+
+.PARAMETER UserPrincipalName
+    One or more users to export.
+
+.PARAMETER CsvPath
+    A CSV file with a column named UserPrincipalName or UPN.
+
+.PARAMETER AllUsers
+    Export every member account in the tenant.
+
+.PARAMETER ExportPath
+    Local folder to save the files in. It is created if it does not exist.
+
+.EXAMPLE
+    .\Export-OneDriveFiles.ps1 -UserPrincipalName alex.wilber@contoso.com -ExportPath D:\OneDriveExport
+
+.EXAMPLE
+    .\Export-OneDriveFiles.ps1 -CsvPath .\users.csv -ExportPath D:\OneDriveExport
+
+.EXAMPLE
+    .\Export-OneDriveFiles.ps1 -AllUsers -ExportPath D:\OneDriveExport
+
+.NOTES
+    Author      : Kamruzzaman Akib
+    Modules     : Microsoft.Graph.Authentication, Microsoft.Graph.Users, Microsoft.Graph.Files
+    Permissions : Files.Read.All, User.Read.All (delegated)
+    Replaces my three earlier scripts (single user, CSV list, whole organisation).
+    OneNote notebooks are listed as not exported: export them from OneNote instead.
+    Paths longer than 260 characters can fail unless Windows long paths are enabled.
+#&gt;
+#Requires -Modules Microsoft.Graph.Authentication, Microsoft.Graph.Users, Microsoft.Graph.Files
+
+[CmdletBinding(DefaultParameterSetName = &#x27;User&#x27;)]
+param(
+    [Parameter(Mandatory, ParameterSetName = &#x27;User&#x27;)]
+    [string[]]$UserPrincipalName,
+
+    [Parameter(Mandatory, ParameterSetName = &#x27;Csv&#x27;)]
+    [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
+    [string]$CsvPath,
+
+    [Parameter(Mandatory, ParameterSetName = &#x27;All&#x27;)]
+    [switch]$AllUsers,
+
+    [Parameter(Mandatory)]
+    [string]$ExportPath
+)
+
+$stats      = @{ Files = 0; AlreadyThere = 0; Failed = 0; Bytes = 0 }
+$notExported = [System.Collections.Generic.List[string]]::new()
+
+function Save-DriveFolder {
+    param(
+        [string]$DriveId,
+        [string]$ItemId,
+        [string]$LocalPath,
+        [switch]$IsRoot
+    )
+    New-Item -ItemType Directory -Path $LocalPath -Force | Out-Null
+
+    try {
+        # -All follows paging. Without it, folders with more than 200 items are cut short.
+        $children = Get-MgDriveItemChild -DriveId $DriveId -DriveItemId $ItemId -All -ErrorAction Stop
+    }
+    catch {
+        if ($IsRoot) { throw }
+        $script:stats.Failed++
+        Write-Warning &quot;Could not list $($LocalPath): $($_.Exception.Message)&quot;
+        return
+    }
+
+    foreach ($item in $children) {
+        $target = Join-Path -Path $LocalPath -ChildPath $item.Name
+
+        if ($item.Folder) {
+            Save-DriveFolder -DriveId $DriveId -ItemId $item.Id -LocalPath $target
+        }
+        elseif ($item.File) {
+            if ((Test-Path -LiteralPath $target) -and (Get-Item -LiteralPath $target).Length -eq $item.Size) {
+                $script:stats.AlreadyThere++
+                continue
+            }
+            try {
+                Get-MgDriveItemContent -DriveId $DriveId -DriveItemId $item.Id -OutFile $target -ErrorAction Stop
+                $script:stats.Files++
+                $script:stats.Bytes += $item.Size
+                Write-Verbose &quot;Downloaded $target&quot;
+            }
+            catch {
+                $script:stats.Failed++
+                Write-Warning &quot;Could not download $($target): $($_.Exception.Message)&quot;
+            }
+        }
+        else {
+            # OneNote notebooks and other packages are not plain files
+            $notExported.Add($target)
+        }
+    }
+}
+
+# --- Connect and work out who to export --------------------------------------
+Connect-MgGraph -Scopes &#x27;Files.Read.All&#x27;, &#x27;User.Read.All&#x27; -NoWelcome -ErrorAction Stop
+
+switch ($PSCmdlet.ParameterSetName) {
+    &#x27;User&#x27; {
+        $upns = $UserPrincipalName
+    }
+    &#x27;Csv&#x27; {
+        $rows = @(Import-Csv -Path $CsvPath)
+        if ($rows.Count -eq 0) { throw &quot;The CSV file &#x27;$CsvPath&#x27; is empty.&quot; }
+        $column = $rows[0].PSObject.Properties.Name |
+            Where-Object { $_ -in &#x27;UserPrincipalName&#x27;, &#x27;UPN&#x27; } |
+            Select-Object -First 1
+        if (-not $column) { throw &#x27;The CSV file needs a column named UserPrincipalName or UPN.&#x27; }
+        $upns = $rows.$column | Where-Object { $_ } | ForEach-Object { $_.Trim() }
+    }
+    &#x27;All&#x27; {
+        $upns = Get-MgUser -All -Filter &quot;userType eq &#x27;Member&#x27;&quot; -Property UserPrincipalName -ErrorAction Stop |
+            Select-Object -ExpandProperty UserPrincipalName
+    }
+}
+$upns = @($upns | Sort-Object -Unique)
+Write-Host &quot;Users to export: $($upns.Count)&quot; -ForegroundColor Cyan
+New-Item -ItemType Directory -Path $ExportPath -Force | Out-Null
+
+# --- Export each OneDrive ----------------------------------------------------
+$usersDone    = 0
+$usersSkipped = [System.Collections.Generic.List[string]]::new()
+$i = 0
+
+foreach ($upn in $upns) {
+    $i++
+    Write-Progress -Activity &#x27;Exporting OneDrives&#x27; -Status &quot;$upn ($i of $($upns.Count))&quot; -PercentComplete ($i / $upns.Count * 100)
+
+    try {
+        $drive = Get-MgUserDefaultDrive -UserId $upn -ErrorAction Stop
+        Write-Host &quot;Exporting $upn&quot; -ForegroundColor Cyan
+        Save-DriveFolder -DriveId $drive.Id -ItemId &#x27;root&#x27; -LocalPath (Join-Path -Path $ExportPath -ChildPath $upn) -IsRoot
+        $usersDone++
+    }
+    catch {
+        $usersSkipped.Add($upn)
+        Write-Warning &quot;Skipped $($upn): no OneDrive, or you are not Site Collection Administrator on it. $($_.Exception.Message)&quot;
+    }
+}
+Write-Progress -Activity &#x27;Exporting OneDrives&#x27; -Completed
+
+# --- Summary -----------------------------------------------------------------
+Write-Host &#x27;&#x27;
+Write-Host &quot;Users exported   : $usersDone of $($upns.Count)&quot; -ForegroundColor Green
+Write-Host &quot;Files downloaded : $($stats.Files) ($([math]::Round($stats.Bytes / 1GB, 2)) GB)&quot;
+Write-Host &quot;Already there    : $($stats.AlreadyThere)&quot;
+if ($stats.Failed) { Write-Host &quot;Failed           : $($stats.Failed) (see the warnings above, then run again)&quot; -ForegroundColor Red }
+if ($usersSkipped.Count) {
+    Write-Host &quot;Users skipped    : $($usersSkipped -join &#x27;, &#x27;)&quot; -ForegroundColor Yellow
+}
+if ($notExported.Count) {
+    Write-Host &quot;Not exported (OneNote notebooks or other packages): $($notExported.Count)&quot; -ForegroundColor Yellow
+    $notExported | ForEach-Object { Write-Host &quot;  $_&quot; }
+}
+Write-Host &quot;Files are in $((Resolve-Path -Path $ExportPath).Path)&quot;
+
+Disconnect-MgGraph | Out-Null</code></pre></details>
+        </article>
+        </div>
+        <h2 class="cat-title">Active Directory</h2>
+        <div class="script-list">
+        <article class="script-entry reveal" id="new-aduserfromtemplate">
+          <div class="script-entry-head">
+            <div>
+              <code class="script-file">New-ADUserFromTemplate.ps1</code>
+              <h3>Create a new AD user by copying a teammate</h3>
+            </div>
+            <div class="script-actions">
+              <a class="btn btn-primary btn-small" href="New-ADUserFromTemplate.ps1" download>Download</a>
+              
+            </div>
+          </div>
+          <p>My onboarding shortcut: type the name, pick the OU and a template user, and it builds a unique username, creates the account (password change forced at first sign-in), copies company, department and office, and adds the same groups. Shows everything first and supports -WhatIf.</p>
+          <p class="script-meta"><strong>Module:</strong> ActiveDirectory (RSAT), Windows PowerShell 5.1<br><strong>Admin role:</strong> Rights to create users in the OU and change membership of the copied groups</p>
+          <details><summary>View the code (200 lines)</summary><pre><code class="lang-powershell">&lt;#
+.SYNOPSIS
+    Creates an on-premises Active Directory user by copying a template user from the
+    same OU.
+
+.DESCRIPTION
+    The onboarding shortcut I used for new joiners. You type the first and last name,
+    pick the OU and a template user (someone in the same team), and the script:
+
+      - builds a unique username (first initial + last name, then 1, 2, 3... if taken),
+        removing accents and punctuation (Jose O&#x27;Brien -&gt; jobrien)
+      - creates the account with the UPN and email address set, and forces a password
+        change at first sign-in
+      - copies Company, Department and Office from the template user
+      - adds the new user to the same groups as the template user
+
+    It shows what it is about to do before it does it. Run it with -WhatIf for a dry run.
+
+.PARAMETER SearchBase
+    Distinguished name of the OU that holds your user OUs, for example
+    &quot;OU=Staff,DC=corp,DC=contoso,DC=com&quot;. Default: the whole domain.
+
+.PARAMETER UpnSuffix
+    The part after @ in the new user&#x27;s UPN and email address, for example contoso.com.
+    Default: the domain&#x27;s DNS name.
+
+.PARAMETER FirstName
+    Optional. You are asked for it if you leave it out.
+
+.PARAMETER LastName
+    Optional. You are asked for it if you leave it out.
+
+.EXAMPLE
+    .\New-ADUserFromTemplate.ps1 -SearchBase &quot;OU=Staff,DC=corp,DC=contoso,DC=com&quot; -UpnSuffix contoso.com -WhatIf
+
+.EXAMPLE
+    .\New-ADUserFromTemplate.ps1 -UpnSuffix contoso.com -FirstName Alex -LastName Wilber
+
+.NOTES
+    Author : Kamruzzaman Akib
+    Module : ActiveDirectory (RSAT), Windows PowerShell 5.1
+    Rights : create users in the chosen OU and change membership of the copied groups
+    The OU and template pickers use Out-GridView.
+    The password is typed as a secure string and is never shown or saved.
+#&gt;
+#Requires -Modules ActiveDirectory
+
+[CmdletBinding(SupportsShouldProcess)]
+param(
+    [string]$SearchBase,
+    [string]$UpnSuffix,
+    [string]$FirstName,
+    [string]$LastName
+)
+
+$domain = Get-ADDomain -ErrorAction Stop
+if (-not $SearchBase) { $SearchBase = $domain.DistinguishedName }
+if (-not $UpnSuffix)  { $UpnSuffix  = $domain.DNSRoot }
+
+# Use one domain controller for every step, so the new account is never
+# &quot;not found&quot; because of replication delay.
+$server = $domain.PDCEmulator
+
+function ConvertTo-UsernamePart {
+    param([string]$Text)
+    # Remove accents (an accented e becomes e), then anything that is not a letter (O&#x27;Brien -&gt; OBrien)
+    $decomposed = $Text.Normalize([Text.NormalizationForm]::FormD)
+    $letters = $decomposed.ToCharArray() | Where-Object {
+        [Globalization.CharUnicodeInfo]::GetUnicodeCategory($_) -ne [Globalization.UnicodeCategory]::NonSpacingMark
+    }
+    (-join $letters).ToLower() -replace &#x27;[^a-z]&#x27;, &#x27;&#x27;
+}
+
+function New-UniqueUsername {
+    param([string]$First, [string]$Last)
+    $f = ConvertTo-UsernamePart $First
+    $l = ConvertTo-UsernamePart $Last
+    if (-not $f -or -not $l) { throw &#x27;The first and last name must contain letters.&#x27; }
+
+    # sAMAccountName allows 20 characters; keep room for a number on the end
+    $base = $f.Substring(0, 1) + $l
+    if ($base.Length -gt 17) { $base = $base.Substring(0, 17) }
+
+    $candidate = $base
+    $n = 0
+    while (Get-ADUser -Server $server -Filter &quot;SamAccountName -eq &#x27;$candidate&#x27; -or UserPrincipalName -eq &#x27;$candidate@$UpnSuffix&#x27;&quot;) {
+        $n++
+        $candidate = &quot;$base$n&quot;
+    }
+    $candidate
+}
+
+# --- Names -----------------------------------------------------------------------
+if (-not $FirstName) { $FirstName = Read-Host &#x27;First name&#x27; }
+if (-not $LastName)  { $LastName  = Read-Host &#x27;Last name&#x27; }
+$FirstName = $FirstName.Trim()
+$LastName  = $LastName.Trim()
+
+# --- Pick the OU and the template user ----------------------------------------------
+$ou = Get-ADOrganizationalUnit -Server $server -Filter * -SearchBase $SearchBase |
+    Sort-Object DistinguishedName |
+    Select-Object Name, DistinguishedName |
+    Out-GridView -Title &#x27;Pick the OU for the new user&#x27; -OutputMode Single
+if (-not $ou) { Write-Warning &#x27;No OU picked. Nothing was created.&#x27;; return }
+
+$candidates = @(Get-ADUser -Server $server -Filter &#x27;Enabled -eq $true&#x27; -SearchBase $ou.DistinguishedName -SearchScope OneLevel -Properties Title, Department)
+$template = $null
+if ($candidates.Count -eq 0) {
+    Write-Warning &#x27;There are no enabled users in this OU to copy, so no groups will be copied.&#x27;
+}
+else {
+    $pick = $candidates |
+        Sort-Object Name |
+        Select-Object Name, SamAccountName, Title, Department, DistinguishedName |
+        Out-GridView -Title &#x27;Pick a template user (someone in the same role or team)&#x27; -OutputMode Single
+    if (-not $pick) { Write-Warning &#x27;No template user picked. Nothing was created.&#x27;; return }
+    $template = Get-ADUser -Server $server -Identity $pick.DistinguishedName -Properties MemberOf, Company, Department, Office
+}
+$groups = if ($template) { @($template.MemberOf) } else { @() }
+
+# --- Build the account details ------------------------------------------------------
+$username    = New-UniqueUsername -First $FirstName -Last $LastName
+$upn         = &quot;$username@$UpnSuffix&quot;
+$displayName = &quot;$FirstName $LastName&quot;
+
+# The object name (CN) must be unique inside the OU
+$cn = $displayName
+$escapedName = $displayName -replace &quot;&#x27;&quot;, &quot;&#x27;&#x27;&quot;
+if (Get-ADUser -Server $server -Filter &quot;Name -eq &#x27;$escapedName&#x27;&quot; -SearchBase $ou.DistinguishedName -SearchScope OneLevel) {
+    $cn = &quot;$displayName ($username)&quot;
+}
+
+Write-Host &#x27;&#x27;
+Write-Host &#x27;About to create:&#x27; -ForegroundColor Cyan
+[PSCustomObject]@{
+    Name     = $cn
+    Username = $username
+    UPN      = $upn
+    OU       = $ou.DistinguishedName
+    Template = if ($template) { $template.Name } else { &#x27;(none)&#x27; }
+    Groups   = $groups.Count
+} | Format-List
+
+if (-not $PSCmdlet.ShouldProcess($upn, &quot;Create user in $($ou.DistinguishedName)&quot;)) { return }
+
+$password = Read-Host &#x27;Initial password (the user must change it at first sign-in)&#x27; -AsSecureString
+
+$newUser = @{
+    Server                = $server
+    Name                  = $cn
+    GivenName             = $FirstName
+    Surname               = $LastName
+    DisplayName           = $displayName
+    SamAccountName        = $username
+    UserPrincipalName     = $upn
+    EmailAddress          = $upn
+    Path                  = $ou.DistinguishedName
+    AccountPassword       = $password
+    Enabled               = $true
+    ChangePasswordAtLogon = $true
+    PassThru              = $true
+    ErrorAction           = &#x27;Stop&#x27;
+}
+if ($template) {
+    foreach ($attribute in &#x27;Company&#x27;, &#x27;Department&#x27;, &#x27;Office&#x27;) {
+        if ($template.$attribute) { $newUser[$attribute] = $template.$attribute }
+    }
+}
+
+try {
+    $created = New-ADUser @newUser
+}
+catch {
+    Write-Warning &quot;The user was not created: $($_.Exception.Message)&quot;
+    Write-Warning &#x27;If the message is about the password, the account may exist but be disabled. Reset its password and enable it in Active Directory Users and Computers.&#x27;
+    return
+}
+Write-Host &quot;Created $upn in $($ou.DistinguishedName).&quot; -ForegroundColor Green
+
+# --- Copy the template user&#x27;s groups -------------------------------------------------
+$added  = 0
+$failed = 0
+foreach ($group in $groups) {
+    try {
+        Add-ADGroupMember -Server $server -Identity $group -Members $created -ErrorAction Stop
+        $added++
+    }
+    catch {
+        $failed++
+        Write-Warning &quot;Could not add to $($group): $($_.Exception.Message)&quot;
+    }
+}
+if ($template) {
+    Write-Host &quot;Added to $added of $($groups.Count) groups copied from $($template.Name).&quot; -ForegroundColor Green
+}
+if ($failed) { Write-Host &quot;$failed groups failed. Add those by hand.&quot; -ForegroundColor Yellow }
+
+Write-Host &#x27;&#x27;
+Write-Host &quot;Sign-in name for the new user: $upn&quot; -ForegroundColor Cyan
+Write-Host &#x27;Give them the password you typed through a secure channel. They must change it at first sign-in.&#x27;</code></pre></details>
+        </article>
+        </div>
+        <div class="kb-grid kb-more script-more">
+          <div class="kb-group reveal kb-wide">
+            <h3>More scripts inside my guides</h3>
+            <ul><li><a href="../articles/bulk-distribution-groups-exchange.html">Bulk create distribution groups in Exchange Online from a CSV</a></li><li><a href="../articles/gam-google-chat-api.html">Export every Google Chat space with GAM</a></li><li><a href="../articles/fix-80180026-entra-enrolment.html">Clear the registry flag behind enrolment error 80180026</a></li></ul>
+          </div>
+          <div class="kb-group reveal internal-mini">
+            <h3>…and some that stay internal</h3>
+            <p>Some of my scripts are built around one company’s own structure, so they stay on internal systems. For example, the GAM reports I used to review Google Workspace licences, and offboarding steps tied to internal tools.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Kamruzzaman Akib. Built with plain HTML, CSS and JavaScript, hosted free on GitHub Pages.</p>
+      <p><a href="../index.html">Home</a> · <a href="../articles/index.html">All articles</a> · <a href="../scripts/index.html">Scripts</a> · <a href="#top">Back to top</a></p>
+    </div>
+  </footer>
+  <script src="../assets/js/main.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fix “The User Profile Service failed the sign-in” on Windows 11 | Kamruzzaman Akib</title>
+  <meta name="description" content="A safe order of operations for the User Profile Service sign-in error on Intune-managed devices: a single Advanced Startup round-trip first, and a Keep-my-files reset only if needed.">
+  <meta name="author" content="Kamruzzaman Akib">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="canonical" href="https://kamruzzamanakib.github.io/articles/fix-user-profile-service.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Fix “The User Profile Service failed the sign-in” on Windows 11 | Kamruzzaman Akib">
+  <meta property="og:description" content="A safe order of operations for the User Profile Service sign-in error on Intune-managed devices: a single Advanced Startup round-trip first, and a Keep-my-files reset only if needed.">
+  <meta property="og:url" content="https://kamruzzamanakib.github.io/articles/fix-user-profile-service.html">
+  <meta property="og:image" content="https://kamruzzamanakib.github.io/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script>
+    (function () { try { var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Fix “The User Profile Service failed the sign-in” on Windows 11",
+  "description": "A safe order of operations for the User Profile Service sign-in error on Intune-managed devices: a single Advanced Startup round-trip first, and a Keep-my-files reset only if needed.",
+  "author": {
+    "@type": "Person",
+    "name": "Kamruzzaman Akib",
+    "url": "https://kamruzzamanakib.github.io/"
+  },
+  "url": "https://kamruzzamanakib.github.io/articles/fix-user-profile-service.html",
+  "inLanguage": "en",
+  "keywords": "Windows 11, Intune, Troubleshooting, Recovery"
+}
+  </script>
+</head>
+<body class="article-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="Kamruzzaman Akib, home">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <span class="brand-name">Kamruzzaman Akib</span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#experience">Experience</a></li>
+          <li><a href="../index.html#projects">Projects</a></li>
+          <li><a href="../articles/index.html" class="active" aria-current="page">Articles</a></li>
+          <li><a href="../scripts/index.html">Scripts</a></li>
+          <li><a href="../index.html#skills">Skills</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <article class="article">
+      <header class="article-hero">
+        <div class="container article-narrow">
+          <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a><span aria-hidden="true">/</span><a href="index.html">Articles</a><span aria-hidden="true">/</span><span>Windows &amp; endpoints</span></nav>
+          <p class="article-cat">Windows &amp; endpoints</p>
+          <h1>Fix “The User Profile Service failed the sign-in” on Windows 11</h1>
+          <p class="article-summary">A safe order of operations for the User Profile Service sign-in error on Intune-managed devices: a single Advanced Startup round-trip first, and a Keep-my-files reset only if needed.</p>
+          <p class="article-meta">By Kamruzzaman Akib · 3 min read</p>
+          <ul class="chips"><li>Windows 11</li><li>Intune</li><li>Troubleshooting</li><li>Recovery</li></ul>
+        </div>
+      </header>
+      <div class="container article-narrow article-body">
+        <aside class="provenance" role="note"><strong>About this article.</strong> I originally wrote this guide for my company’s internal knowledge base. This public version has company names, colleagues’ names and email addresses, internal domains and system details removed. Screenshots are shown at full size: click any of them to enlarge. Only the parts that showed people or company information are blurred. Example addresses use Microsoft’s fictional <code>contoso.com</code> domain.</aside>
+
+<p><em>“The User Profile Service failed the sign-in”</em> is a long-standing Windows error that locks a user out. On our Intune-managed laptops it was usually caused by a broken sync with Intune. This is the least destructive fix I found. Most of the time, step 3 alone solves it.</p>
+
+<h2>Steps</h2>
+<ol class="steps">
+  <li><strong>Sign in with another local account</strong> on the device (not a Microsoft account).</li>
+  <li><strong>Open Advanced startup from Windows:</strong> go to <em>Settings → System → Recovery</em> (or search for “Reset this PC”). Next to <em>Advanced startup</em>, click <strong>Restart now</strong>.
+  <figure class="shot"><a href="img/fix-user-profile-service/img01.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/fix-user-profile-service/img01.png" alt="Settings → System → Recovery → Advanced startup" width="712" height="486" loading="lazy" decoding="async"></a><figcaption>Settings → System → Recovery → Advanced startup</figcaption></figure></li>
+  <li><strong>Choose Continue (important):</strong> the PC restarts to the blue <em>Choose an option</em> screen. Select <strong>Continue</strong> (“Exit and continue to Windows 11”). <strong>Don't</strong> go into Troubleshoot yet. This round-trip makes Windows rebuild the Intune sync cleanly without touching any data.
+  <figure class="shot"><a href="img/fix-user-profile-service/img02.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/fix-user-profile-service/img02.jpg" alt="Choose “Continue”" width="712" height="453" loading="lazy" decoding="async"></a><figcaption>Choose “Continue”</figcaption></figure></li>
+  <li><strong>Sign in with the user's work account.</strong> After the restart, the user's account should now sign in normally.</li>
+</ol>
+
+<h2>If the error persists: reset with “Keep my files”</h2>
+<ol class="steps" start="5">
+  <li>Go back to Advanced startup (step 2).</li>
+  <li>This time choose <strong>Troubleshoot → Reset this PC → Keep my files</strong>.
+  <figure class="shot"><a href="img/fix-user-profile-service/img03.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/fix-user-profile-service/img03.jpg" alt="Keep my files" width="713" height="293" loading="lazy" decoding="async"></a><figcaption>Keep my files</figcaption></figure></li>
+  <li>Follow the prompts. Windows is reinstalled but the user's personal files are kept. Applications need reinstalling (Intune will push the required ones again).</li>
+</ol>
+
+        <nav class="article-pager" aria-label="More articles"><a class="pager-prev" href="install-ubuntu-encrypted.html"><span>Previous</span>Install Ubuntu 24.04 LTS with full-disk encryption from a bootable USB</a><a class="pager-next" href="unable-to-delete-c-wim.html"><span>Next</span>Troubleshooting “Unable to delete C:\wim”</a></nav>
+        <p class="back-link"><a href="index.html">← All articles</a></p>
+      </div>
+    </article>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Kamruzzaman Akib. Built with plain HTML, CSS and JavaScript, hosted free on GitHub Pages.</p>
+      <p><a href="../index.html">Home</a> · <a href="../articles/index.html">All articles</a> · <a href="../scripts/index.html">Scripts</a> · <a href="#top">Back to top</a></p>
+    </div>
+  </footer>
+  <script src="../assets/js/main.js" defer></script>
+</body>
+</html>

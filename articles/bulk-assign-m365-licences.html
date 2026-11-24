@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bulk assign (and remove) Microsoft 365 licences with PowerShell and Microsoft Graph | Kamruzzaman Akib</title>
+  <meta name="description" content="Two Graph PowerShell scripts that read UPNs from a CSV, let you pick a licence from a grid, and assign it to (or remove it from) every user, with a dry-run mode and checks for usage location and group-based licences.">
+  <meta name="author" content="Kamruzzaman Akib">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="canonical" href="https://kamruzzamanakib.github.io/articles/bulk-assign-m365-licences.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Bulk assign (and remove) Microsoft 365 licences with PowerShell and Microsoft Graph | Kamruzzaman Akib">
+  <meta property="og:description" content="Two Graph PowerShell scripts that read UPNs from a CSV, let you pick a licence from a grid, and assign it to (or remove it from) every user, with a dry-run mode and checks for usage location and group-based licences.">
+  <meta property="og:url" content="https://kamruzzamanakib.github.io/articles/bulk-assign-m365-licences.html">
+  <meta property="og:image" content="https://kamruzzamanakib.github.io/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script>
+    (function () { try { var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Bulk assign (and remove) Microsoft 365 licences with PowerShell and Microsoft Graph",
+  "description": "Two Graph PowerShell scripts that read UPNs from a CSV, let you pick a licence from a grid, and assign it to (or remove it from) every user, with a dry-run mode and checks for usage location and group-based licences.",
+  "author": {
+    "@type": "Person",
+    "name": "Kamruzzaman Akib",
+    "url": "https://kamruzzamanakib.github.io/"
+  },
+  "url": "https://kamruzzamanakib.github.io/articles/bulk-assign-m365-licences.html",
+  "inLanguage": "en",
+  "keywords": "PowerShell, Microsoft Graph, Licensing, Entra ID, Automation"
+}
+  </script>
+</head>
+<body class="article-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="Kamruzzaman Akib, home">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <span class="brand-name">Kamruzzaman Akib</span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#experience">Experience</a></li>
+          <li><a href="../index.html#projects">Projects</a></li>
+          <li><a href="../articles/index.html" class="active" aria-current="page">Articles</a></li>
+          <li><a href="../scripts/index.html">Scripts</a></li>
+          <li><a href="../index.html#skills">Skills</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <article class="article">
+      <header class="article-hero">
+        <div class="container article-narrow">
+          <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a><span aria-hidden="true">/</span><a href="index.html">Articles</a><span aria-hidden="true">/</span><span>PowerShell &amp; Microsoft 365</span></nav>
+          <p class="article-cat">PowerShell &amp; Microsoft 365</p>
+          <h1>Bulk assign (and remove) Microsoft 365 licences with PowerShell and Microsoft Graph</h1>
+          <p class="article-summary">Two Graph PowerShell scripts that read UPNs from a CSV, let you pick a licence from a grid, and assign it to (or remove it from) every user, with a dry-run mode and checks for usage location and group-based licences.</p>
+          <p class="article-meta">By Kamruzzaman Akib · 5 min read</p>
+          <ul class="chips"><li>PowerShell</li><li>Microsoft Graph</li><li>Licensing</li><li>Entra ID</li><li>Automation</li></ul>
+        </div>
+      </header>
+      <div class="container article-narrow article-body">
+        <aside class="provenance" role="note"><strong>About this article.</strong> I originally wrote this guide for my company’s internal knowledge base. This public version has company names, colleagues’ names and email addresses, internal domains and system details removed. Screenshots are shown at full size: click any of them to enlarge. Only the parts that showed people or company information are blurred. Example addresses use Microsoft’s fictional <code>contoso.com</code> domain.</aside>
+
+<p>Assigning licences one by one in the admin centre doesn’t scale during onboarding waves or migrations. These two scripts read users from a CSV and add or remove the licence you choose, checking each user first. I used the same approach in reverse to <strong>reclaim hundreds of unused licences</strong> after a tenant integration.</p>
+
+<h2>What you need</h2>
+<ul>
+  <li>Windows PowerShell 5.1, or PowerShell 7 on Windows (the licence picker uses <code>Out-GridView</code>).</li>
+  <li>The Microsoft Graph PowerShell SDK.</li>
+  <li>An account with the <strong>License Administrator</strong> or <strong>User Administrator</strong> role.</li>
+</ul>
+
+<h2>Step 1: Install the Microsoft Graph modules</h2>
+<p>Open PowerShell as administrator and run:</p>
+<pre><code class="lang-powershell">Install-Module Microsoft.Graph -AllowClobber</code></pre>
+
+<h2>Step 2: Prepare the CSV</h2>
+<p>One column with the header <code>UPN</code> (or <code>UserPrincipalName</code>), one user per row:</p>
+<pre><code class="lang-csv">UPN
+alex.wilber@contoso.com
+megan.bowen@contoso.com
+lee.gu@contoso.com</code></pre>
+<figure class="shot"><a href="img/bulk-assign-m365-licences/img03.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/bulk-assign-m365-licences/img03.png" alt="The input CSV (one UPN per row)" width="425" height="309" loading="lazy" decoding="async"></a><figcaption>The input CSV (one UPN per row)</figcaption></figure>
+
+<h2>Step 3: Get the script</h2>
+<div class="script-block"><div class="script-head"><code class="script-name">Add-LicensesFromCsv.ps1</code><span class="script-head-links"><a href="../scripts/index.html#add-licensesfromcsv">In the script library</a><a class="btn btn-primary btn-small" href="../scripts/Add-LicensesFromCsv.ps1" download>Download</a></span></div><details><summary>Show the full script (115 lines)</summary><pre><code class="lang-powershell">&lt;#
+.SYNOPSIS
+    Assigns one Microsoft 365 licence to every user listed in a CSV file.
+
+.DESCRIPTION
+    Reads user principal names (UPNs) from a CSV file, lets you pick a licence (SKU)
+    from the tenant in a grid, then assigns it to each user who does not already have it.
+
+    Users who already have the licence are skipped. Users with no usage location are
+    skipped too, because Microsoft 365 cannot assign a licence without one.
+
+    Run it with -WhatIf first to see what would change without changing anything.
+
+.PARAMETER CsvPath
+    Path to the CSV file. It needs a column named UPN (or UserPrincipalName).
+
+.EXAMPLE
+    .\Add-LicensesFromCsv.ps1 -CsvPath .\users.csv -WhatIf
+    Dry run: shows which users would get the licence.
+
+.EXAMPLE
+    .\Add-LicensesFromCsv.ps1 -CsvPath .\users.csv
+    Assigns the licence you pick to every user in users.csv.
+
+.NOTES
+    Author      : Kamruzzaman Akib
+    Modules     : Microsoft.Graph.Authentication, Microsoft.Graph.Users,
+                  Microsoft.Graph.Identity.DirectoryManagement
+    Permissions : LicenseAssignment.ReadWrite.All, User.Read.All, Organization.Read.All (delegated)
+    Admin role  : License Administrator or User Administrator
+    The licence picker uses Out-GridView, which needs Windows.
+#&gt;
+#Requires -Modules Microsoft.Graph.Authentication, Microsoft.Graph.Users, Microsoft.Graph.Identity.DirectoryManagement
+
+[CmdletBinding(SupportsShouldProcess)]
+param(
+    [Parameter(Mandatory)]
+    [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
+    [string]$CsvPath
+)
+
+# --- Read and check the CSV -------------------------------------------------
+$rows = @(Import-Csv -Path $CsvPath)
+if ($rows.Count -eq 0) {
+    throw &quot;The CSV file &#x27;$CsvPath&#x27; is empty.&quot;
+}
+$upnColumn = $rows[0].PSObject.Properties.Name |
+    Where-Object { $_ -in &#x27;UPN&#x27;, &#x27;UserPrincipalName&#x27; } |
+    Select-Object -First 1
+if (-not $upnColumn) {
+    throw &#x27;The CSV file needs a column named UPN or UserPrincipalName.&#x27;
+}
+
+# --- Connect to Microsoft Graph ---------------------------------------------
+Connect-MgGraph -Scopes &#x27;LicenseAssignment.ReadWrite.All&#x27;, &#x27;User.Read.All&#x27;, &#x27;Organization.Read.All&#x27; -NoWelcome -ErrorAction Stop
+
+# --- Pick the licence --------------------------------------------------------
+$sku = Get-MgSubscribedSku -ErrorAction Stop |
+    Select-Object SkuPartNumber, SkuId, ConsumedUnits,
+        @{ Name = &#x27;Available&#x27;; Expression = { $_.PrepaidUnits.Enabled - $_.ConsumedUnits } } |
+    Out-GridView -Title &#x27;Select the licence to assign&#x27; -OutputMode Single
+
+if (-not $sku) {
+    Write-Warning &#x27;No licence selected. Nothing was changed.&#x27;
+    return
+}
+Write-Host &quot;Selected licence: $($sku.SkuPartNumber) ($($sku.SkuId))&quot; -ForegroundColor Cyan
+
+# --- Assign the licence to each user ----------------------------------------
+$assigned = 0; $skipped = 0; $failed = 0
+
+foreach ($row in $rows) {
+    $upn = &quot;$($row.$upnColumn)&quot;.Trim()
+    if (-not $upn) { continue }
+
+    try {
+        $user = Get-MgUser -UserId $upn -Property Id, UserPrincipalName, UsageLocation, AssignedLicenses -ErrorAction Stop
+    } catch {
+        Write-Warning &quot;$upn : could not find or read this user. $($_.Exception.Message)&quot;
+        $failed++
+        continue
+    }
+
+    if ($user.AssignedLicenses.SkuId -contains $sku.SkuId) {
+        Write-Host &quot;$upn already has $($sku.SkuPartNumber). Skipped.&quot; -ForegroundColor DarkGray
+        $skipped++
+        continue
+    }
+
+    if (-not $user.UsageLocation) {
+        Write-Warning &quot;$upn has no usage location, so a licence cannot be assigned. Set one and run the script again.&quot;
+        $skipped++
+        continue
+    }
+
+    if ($PSCmdlet.ShouldProcess($upn, &quot;Assign licence $($sku.SkuPartNumber)&quot;)) {
+        $body = @{
+            addLicenses    = @(@{ skuId = $sku.SkuId })
+            removeLicenses = @()
+        } | ConvertTo-Json -Depth 5
+
+        try {
+            Invoke-MgGraphRequest -Method POST -Uri &quot;https://graph.microsoft.com/v1.0/users/$($user.Id)/assignLicense&quot; `
+                -Body $body -ContentType &#x27;application/json&#x27; -ErrorAction Stop | Out-Null
+            Write-Host &quot;$upn : assigned $($sku.SkuPartNumber)&quot; -ForegroundColor Green
+            $assigned++
+        } catch {
+            Write-Warning &quot;$upn : could not assign the licence. $($_.Exception.Message)&quot;
+            $failed++
+        }
+    }
+}
+
+Write-Host &#x27;&#x27;
+Write-Host &quot;Done. Assigned: $assigned   Skipped: $skipped   Failed: $failed&quot; -ForegroundColor Cyan</code></pre></details></div>
+<p>What it does, in order:</p>
+<ol>
+  <li>Checks that the CSV has a <code>UPN</code> or <code>UserPrincipalName</code> column.</li>
+  <li>Connects to Microsoft Graph with only the permissions it needs: <code>LicenseAssignment.ReadWrite.All</code>, <code>User.Read.All</code> and <code>Organization.Read.All</code>.</li>
+  <li>Lists every licence in the tenant, with how many are still available, and lets you pick one.</li>
+  <li>For each user, skips anyone who already has the licence or has no usage location, then assigns it with the Graph <code>assignLicense</code> call.</li>
+  <li>Finishes with a count of assigned, skipped and failed users.</li>
+</ol>
+
+<h2>Step 4: Run it</h2>
+<ol class="steps">
+  <li>Do a dry run first. Nothing changes; you see a “What if” line for every user who would get the licence:
+<pre><code class="lang-powershell">.\Add-LicensesFromCsv.ps1 -CsvPath .\users.csv -WhatIf</code></pre></li>
+  <li>Run it for real and sign in with an admin account when prompted:
+<pre><code class="lang-powershell">.\Add-LicensesFromCsv.ps1 -CsvPath .\users.csv</code></pre>
+  <figure class="shot"><a href="img/bulk-assign-m365-licences/img04.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/bulk-assign-m365-licences/img04.png" alt="Sign in with an admin account" width="647" height="403" loading="lazy" decoding="async"></a><figcaption>Sign in with an admin account</figcaption></figure></li>
+  <li>A grid lists every licence in the tenant. Pick the one to assign (in this example <strong>EMS</strong>, Enterprise Mobility + Security E3) and click <strong>OK</strong>.
+  <figure class="shot"><a href="img/bulk-assign-m365-licences/img08.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/bulk-assign-m365-licences/img08.jpg" alt="Choose the licence (SKU) from the grid" width="736" height="589" loading="lazy" decoding="async"></a><figcaption>Choose the licence (SKU) from the grid</figcaption></figure></li>
+  <li>The script works through the list, skipping users who already have the licence and reporting each assignment.
+  <figure class="shot"><a href="img/bulk-assign-m365-licences/img01.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/bulk-assign-m365-licences/img01.jpg" alt="Output from a real run (user names blurred)" width="737" height="566" loading="lazy" decoding="async"></a><figcaption>Output from a real run (user names blurred)</figcaption></figure>
+  <figure class="shot wide"><a href="img/bulk-assign-m365-licences/img07.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/bulk-assign-m365-licences/img07.png" alt="The licence now shows on the user" width="982" height="116" loading="lazy" decoding="async"></a><figcaption>The licence now shows on the user</figcaption></figure></li>
+</ol>
+<p>If PowerShell refuses to run the file, see <a href="powershell-execution-policy.html">Fix “running scripts is disabled on this system”</a>.</p>
+<aside class="callout"><strong>No usage location, no licence.</strong> Microsoft 365 can’t assign a licence to a user without a usage location, so the script skips them and tells you. Set it in the admin centre, or with <code>Update-MgUser -UserId alex.wilber@contoso.com -UsageLocation PT</code>, then run the script again.</aside>
+
+<h2>Removing licences</h2>
+<p>The companion script works the same way (same CSV, same licence picker, same <code>-WhatIf</code> dry run) but removes the licence. It also checks whether a user gets the licence through group-based licensing. Those licences can’t be removed one user at a time, so instead of failing, the script tells you to take the user out of the licensing group.</p>
+<div class="script-block"><div class="script-head"><code class="script-name">Remove-LicensesFromCsv.ps1</code><span class="script-head-links"><a href="../scripts/index.html#remove-licensesfromcsv">In the script library</a><a class="btn btn-primary btn-small" href="../scripts/Remove-LicensesFromCsv.ps1" download>Download</a></span></div><details><summary>Show the full script (118 lines)</summary><pre><code class="lang-powershell">&lt;#
+.SYNOPSIS
+    Removes one Microsoft 365 licence from every user listed in a CSV file.
+
+.DESCRIPTION
+    Reads user principal names (UPNs) from a CSV file, lets you pick a licence (SKU)
+    from the tenant in a grid, then removes it from each user who has it.
+
+    Users who do not have the licence are skipped. Licences that a user gets through
+    group-based licensing cannot be removed one user at a time, so those users are
+    skipped with a message: remove them from the licensing group instead.
+
+    Run it with -WhatIf first to see what would change without changing anything.
+
+.PARAMETER CsvPath
+    Path to the CSV file. It needs a column named UPN (or UserPrincipalName).
+
+.EXAMPLE
+    .\Remove-LicensesFromCsv.ps1 -CsvPath .\leavers.csv -WhatIf
+    Dry run: shows which users would lose the licence.
+
+.EXAMPLE
+    .\Remove-LicensesFromCsv.ps1 -CsvPath .\leavers.csv
+    Removes the licence you pick from every user in leavers.csv.
+
+.NOTES
+    Author      : Kamruzzaman Akib
+    Modules     : Microsoft.Graph.Authentication, Microsoft.Graph.Users,
+                  Microsoft.Graph.Identity.DirectoryManagement
+    Permissions : LicenseAssignment.ReadWrite.All, User.Read.All, Organization.Read.All (delegated)
+    Admin role  : License Administrator or User Administrator
+    The licence picker uses Out-GridView, which needs Windows.
+#&gt;
+#Requires -Modules Microsoft.Graph.Authentication, Microsoft.Graph.Users, Microsoft.Graph.Identity.DirectoryManagement
+
+[CmdletBinding(SupportsShouldProcess)]
+param(
+    [Parameter(Mandatory)]
+    [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
+    [string]$CsvPath
+)
+
+# --- Read and check the CSV -------------------------------------------------
+$rows = @(Import-Csv -Path $CsvPath)
+if ($rows.Count -eq 0) {
+    throw &quot;The CSV file &#x27;$CsvPath&#x27; is empty.&quot;
+}
+$upnColumn = $rows[0].PSObject.Properties.Name |
+    Where-Object { $_ -in &#x27;UPN&#x27;, &#x27;UserPrincipalName&#x27; } |
+    Select-Object -First 1
+if (-not $upnColumn) {
+    throw &#x27;The CSV file needs a column named UPN or UserPrincipalName.&#x27;
+}
+
+# --- Connect to Microsoft Graph ---------------------------------------------
+Connect-MgGraph -Scopes &#x27;LicenseAssignment.ReadWrite.All&#x27;, &#x27;User.Read.All&#x27;, &#x27;Organization.Read.All&#x27; -NoWelcome -ErrorAction Stop
+
+# --- Pick the licence --------------------------------------------------------
+$sku = Get-MgSubscribedSku -ErrorAction Stop |
+    Select-Object SkuPartNumber, SkuId, ConsumedUnits,
+        @{ Name = &#x27;Available&#x27;; Expression = { $_.PrepaidUnits.Enabled - $_.ConsumedUnits } } |
+    Out-GridView -Title &#x27;Select the licence to remove&#x27; -OutputMode Single
+
+if (-not $sku) {
+    Write-Warning &#x27;No licence selected. Nothing was changed.&#x27;
+    return
+}
+Write-Host &quot;Selected licence: $($sku.SkuPartNumber) ($($sku.SkuId))&quot; -ForegroundColor Cyan
+
+# --- Remove the licence from each user --------------------------------------
+$removed = 0; $skipped = 0; $failed = 0
+
+foreach ($row in $rows) {
+    $upn = &quot;$($row.$upnColumn)&quot;.Trim()
+    if (-not $upn) { continue }
+
+    try {
+        $user = Get-MgUser -UserId $upn -Property Id, UserPrincipalName, AssignedLicenses, LicenseAssignmentStates -ErrorAction Stop
+    } catch {
+        Write-Warning &quot;$upn : could not find or read this user. $($_.Exception.Message)&quot;
+        $failed++
+        continue
+    }
+
+    if ($user.AssignedLicenses.SkuId -notcontains $sku.SkuId) {
+        Write-Host &quot;$upn does not have $($sku.SkuPartNumber). Skipped.&quot; -ForegroundColor DarkGray
+        $skipped++
+        continue
+    }
+
+    # A licence that only comes from a group cannot be removed from the user directly.
+    $states = @($user.LicenseAssignmentStates | Where-Object { $_.SkuId -eq $sku.SkuId })
+    if ($states.Count -gt 0 -and -not ($states | Where-Object { -not $_.AssignedByGroup })) {
+        Write-Warning &quot;$upn gets $($sku.SkuPartNumber) from a group. Remove the user from that group instead.&quot;
+        $skipped++
+        continue
+    }
+
+    if ($PSCmdlet.ShouldProcess($upn, &quot;Remove licence $($sku.SkuPartNumber)&quot;)) {
+        $body = @{
+            addLicenses    = @()
+            removeLicenses = @($sku.SkuId)
+        } | ConvertTo-Json -Depth 5
+
+        try {
+            Invoke-MgGraphRequest -Method POST -Uri &quot;https://graph.microsoft.com/v1.0/users/$($user.Id)/assignLicense&quot; `
+                -Body $body -ContentType &#x27;application/json&#x27; -ErrorAction Stop | Out-Null
+            Write-Host &quot;$upn : removed $($sku.SkuPartNumber)&quot; -ForegroundColor Green
+            $removed++
+        } catch {
+            Write-Warning &quot;$upn : could not remove the licence. $($_.Exception.Message)&quot;
+            $failed++
+        }
+    }
+}
+
+Write-Host &#x27;&#x27;
+Write-Host &quot;Done. Removed: $removed   Skipped: $skipped   Failed: $failed&quot; -ForegroundColor Cyan</code></pre></details></div>
+<pre><code class="lang-powershell">.\Remove-LicensesFromCsv.ps1 -CsvPath .\leavers.csv -WhatIf
+.\Remove-LicensesFromCsv.ps1 -CsvPath .\leavers.csv</code></pre>
+
+        <nav class="article-pager" aria-label="More articles"><a class="pager-prev" href="powershell-execution-policy.html"><span>Previous</span>Fix “running scripts is disabled on this system” in PowerShell</a><a class="pager-next" href="bulk-distribution-groups-exchange.html"><span>Next</span>Bulk create distribution groups in Exchange Online from a CSV</a></nav>
+        <p class="back-link"><a href="index.html">← All articles</a></p>
+      </div>
+    </article>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Kamruzzaman Akib. Built with plain HTML, CSS and JavaScript, hosted free on GitHub Pages.</p>
+      <p><a href="../index.html">Home</a> · <a href="../articles/index.html">All articles</a> · <a href="../scripts/index.html">Scripts</a> · <a href="#top">Back to top</a></p>
+    </div>
+  </footer>
+  <script src="../assets/js/main.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Package and deploy a Win32 app with Microsoft Intune | Kamruzzaman Akib</title>
+  <meta name="description" content="Use the Microsoft Win32 Content Prep Tool to build an .intunewin package, then create the Win32 app in Intune with silent install/uninstall commands, a file detection rule and a group assignment.">
+  <meta name="author" content="Kamruzzaman Akib">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="canonical" href="https://kamruzzamanakib.github.io/articles/win32-app-intune.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Package and deploy a Win32 app with Microsoft Intune | Kamruzzaman Akib">
+  <meta property="og:description" content="Use the Microsoft Win32 Content Prep Tool to build an .intunewin package, then create the Win32 app in Intune with silent install/uninstall commands, a file detection rule and a group assignment.">
+  <meta property="og:url" content="https://kamruzzamanakib.github.io/articles/win32-app-intune.html">
+  <meta property="og:image" content="https://kamruzzamanakib.github.io/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script>
+    (function () { try { var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Package and deploy a Win32 app with Microsoft Intune",
+  "description": "Use the Microsoft Win32 Content Prep Tool to build an .intunewin package, then create the Win32 app in Intune with silent install/uninstall commands, a file detection rule and a group assignment.",
+  "author": {
+    "@type": "Person",
+    "name": "Kamruzzaman Akib",
+    "url": "https://kamruzzamanakib.github.io/"
+  },
+  "url": "https://kamruzzamanakib.github.io/articles/win32-app-intune.html",
+  "inLanguage": "en",
+  "keywords": "Intune, Win32, IntuneWinAppUtil, App deployment"
+}
+  </script>
+</head>
+<body class="article-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="Kamruzzaman Akib, home">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <span class="brand-name">Kamruzzaman Akib</span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#experience">Experience</a></li>
+          <li><a href="../index.html#projects">Projects</a></li>
+          <li><a href="../articles/index.html" class="active" aria-current="page">Articles</a></li>
+          <li><a href="../scripts/index.html">Scripts</a></li>
+          <li><a href="../index.html#skills">Skills</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <article class="article">
+      <header class="article-hero">
+        <div class="container article-narrow">
+          <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a><span aria-hidden="true">/</span><a href="index.html">Articles</a><span aria-hidden="true">/</span><span>Intune &amp; Entra ID</span></nav>
+          <p class="article-cat">Intune &amp; Entra ID</p>
+          <h1>Package and deploy a Win32 app with Microsoft Intune</h1>
+          <p class="article-summary">Use the Microsoft Win32 Content Prep Tool to build an .intunewin package, then create the Win32 app in Intune with silent install/uninstall commands, a file detection rule and a group assignment.</p>
+          <p class="article-meta">By Kamruzzaman Akib · 6 min read</p>
+          <ul class="chips"><li>Intune</li><li>Win32</li><li>IntuneWinAppUtil</li><li>App deployment</li></ul>
+        </div>
+      </header>
+      <div class="container article-narrow article-body">
+        <aside class="provenance" role="note"><strong>About this article.</strong> I originally wrote this guide for my company’s internal knowledge base. This public version has company names, colleagues’ names and email addresses, internal domains and system details removed. Screenshots are shown at full size: click any of them to enlarge. Only the parts that showed people or company information are blurred. Example addresses use Microsoft’s fictional <code>contoso.com</code> domain.</aside>
+
+<p>Most of the 26+ apps I've deployed through Intune were packaged this way. The example below uses the <strong>Lenovo System Update</strong> installer, but the process is the same for any EXE or MSI.</p>
+
+<h2>Prerequisites</h2>
+<ol>
+  <li>Create a working folder, for example <code>C:\IntuneTools</code>.</li>
+  <li>Download <code>IntuneWinAppUtil.exe</code> from Microsoft's GitHub repository: <a href="https://github.com/microsoft/Microsoft-Win32-Content-Prep-Tool" rel="noopener">Microsoft-Win32-Content-Prep-Tool</a>, and extract it into the folder.</li>
+  <li>Create <code>C:\IntuneTools\input\</code> for the installer files and <code>C:\IntuneTools\output\</code> for the finished package.
+  <figure class="shot"><a href="img/win32-app-intune/img05.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/win32-app-intune/img05.jpg" alt="The IntuneTools folder" width="663" height="344" loading="lazy" decoding="async"></a><figcaption>The IntuneTools folder</figcaption></figure></li>
+</ol>
+
+<h2>Step 1: Build the .intunewin package</h2>
+<ol class="steps">
+  <li>Double-click <code>IntuneWinAppUtil.exe</code> and answer the prompts:
+    <ul>
+      <li><strong>Source folder:</strong> <code>C:\IntuneTools\input\</code></li>
+      <li><strong>Setup file:</strong> <code>system_update_5.08.03.59.exe</code></li>
+      <li><strong>Output folder:</strong> <code>C:\IntuneTools\output\</code> (keep it separate from the source)</li>
+      <li><strong>Catalog folder:</strong> press <kbd>N</kbd> or just <kbd>Enter</kbd>. Catalog files are only needed for some signing scenarios.</li>
+    </ul>
+  <figure class="shot wide"><a href="img/win32-app-intune/img06.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/win32-app-intune/img06.png" alt="Content Prep Tool prompts" width="1107" height="119" loading="lazy" decoding="async"></a><figcaption>Content Prep Tool prompts</figcaption></figure></li>
+  <li>The tool compresses, encrypts and hashes the content and writes the <code>.intunewin</code> file.
+  <figure class="shot"><a href="img/win32-app-intune/img08.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/win32-app-intune/img08.png" alt="Building the package" width="712" height="395" loading="lazy" decoding="async"></a><figcaption>Building the package</figcaption></figure>
+  <figure class="shot"><a href="img/win32-app-intune/img01.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/win32-app-intune/img01.png" alt="The finished .intunewin files" width="657" height="144" loading="lazy" decoding="async"></a><figcaption>The finished .intunewin files</figcaption></figure></li>
+</ol>
+
+<h2>Step 2: Create the app in Intune</h2>
+<ol class="steps" start="3">
+  <li>Sign in to the <a href="https://intune.microsoft.com/" rel="noopener">Microsoft Intune admin center</a> and go to <strong>Apps → Windows → + Add</strong>. Under <em>App type</em> choose <strong>Windows app (Win32)</strong>.
+  <figure class="shot"><a href="img/win32-app-intune/img02.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/win32-app-intune/img02.png" alt="Windows app (Win32)" width="564" height="601" loading="lazy" decoding="async"></a><figcaption>Windows app (Win32)</figcaption></figure></li>
+  <li>Select the package you just built.
+  <figure class="shot"><a href="img/win32-app-intune/img03.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/win32-app-intune/img03.png" alt="Upload the .intunewin" width="567" height="297" loading="lazy" decoding="async"></a><figcaption>Upload the .intunewin</figcaption></figure></li>
+  <li>Fill in Name, Description and Publisher, then click Next.</li>
+  <li>Find the app's silent switches. For Lenovo System Update they are <code>/verysilent /norestart</code>:
+    <ul>
+      <li><strong>Install command:</strong> <code>system_update_5.08.03.59.exe /verysilent /norestart</code>. The file name must match the one you packaged exactly.</li>
+      <li><strong>Uninstall command:</strong> <code>"C:\Program Files (x86)\Lenovo\System Update\unins000.exe" /verysilent /norestart</code></li>
+      <li>Set <strong>Allow available uninstall</strong> to <em>No</em> if users shouldn't remove it.</li>
+    </ul>
+  <figure class="shot"><a href="img/win32-app-intune/img07.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/win32-app-intune/img07.jpg" alt="Program settings" width="712" height="583" loading="lazy" decoding="async"></a><figcaption>Program settings</figcaption></figure></li>
+  <li>Set the requirements (minimum OS, architecture) and click Next.</li>
+  <li>Detection rules: choose <strong>Manually configure detection rules → Add → Rule type: File</strong>. Set <em>Path</em> to the install folder, <em>File or folder</em> to the app's EXE, and the detection method to <strong>File or folder exists</strong>.
+  <figure class="shot"><a href="img/win32-app-intune/img04.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/win32-app-intune/img04.png" alt="File-based detection rule" width="570" height="356" loading="lazy" decoding="async"></a><figcaption>File-based detection rule</figcaption></figure></li>
+  <li>Click through to <strong>Assignments</strong>:
+    <ul>
+      <li><strong>Required</strong>: installs automatically in the background.</li>
+      <li><strong>Available for enrolled devices</strong>: users can install it from Company Portal.</li>
+    </ul></li>
+  <li>Review and click <strong>Create</strong>. Wait for the upload to finish.</li>
+</ol>
+
+        <nav class="article-pager" aria-label="More articles"><a class="pager-prev" href="unable-to-delete-c-wim.html"><span>Previous</span>Troubleshooting “Unable to delete C:\wim”</a><a class="pager-next" href="fix-80180026-entra-enrolment.html"><span>Next</span>Fix error 80180026 when enrolling a device in Microsoft Entra ID</a></nav>
+        <p class="back-link"><a href="index.html">← All articles</a></p>
+      </div>
+    </article>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Kamruzzaman Akib. Built with plain HTML, CSS and JavaScript, hosted free on GitHub Pages.</p>
+      <p><a href="../index.html">Home</a> · <a href="../articles/index.html">All articles</a> · <a href="../scripts/index.html">Scripts</a> · <a href="#top">Back to top</a></p>
+    </div>
+  </footer>
+  <script src="../assets/js/main.js" defer></script>
+</body>
+</html>

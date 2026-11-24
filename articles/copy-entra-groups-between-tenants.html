@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Copy Entra ID groups to another tenant with PowerShell (export, import and clean-up) | Kamruzzaman Akib</title>
+  <meta name="description" content="Three Microsoft Graph PowerShell scripts for a tenant-to-tenant move: export every group to CSV, recreate them in the new tenant with a dry run and an old-to-new ID map, and delete a group by ID when you need to clean up.">
+  <meta name="author" content="Kamruzzaman Akib">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="canonical" href="https://kamruzzamanakib.github.io/articles/copy-entra-groups-between-tenants.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Copy Entra ID groups to another tenant with PowerShell (export, import and clean-up) | Kamruzzaman Akib">
+  <meta property="og:description" content="Three Microsoft Graph PowerShell scripts for a tenant-to-tenant move: export every group to CSV, recreate them in the new tenant with a dry run and an old-to-new ID map, and delete a group by ID when you need to clean up.">
+  <meta property="og:url" content="https://kamruzzamanakib.github.io/articles/copy-entra-groups-between-tenants.html">
+  <meta property="og:image" content="https://kamruzzamanakib.github.io/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script>
+    (function () { try { var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Copy Entra ID groups to another tenant with PowerShell (export, import and clean-up)",
+  "description": "Three Microsoft Graph PowerShell scripts for a tenant-to-tenant move: export every group to CSV, recreate them in the new tenant with a dry run and an old-to-new ID map, and delete a group by ID when you need to clean up.",
+  "author": {
+    "@type": "Person",
+    "name": "Kamruzzaman Akib",
+    "url": "https://kamruzzamanakib.github.io/"
+  },
+  "url": "https://kamruzzamanakib.github.io/articles/copy-entra-groups-between-tenants.html",
+  "inLanguage": "en",
+  "keywords": "PowerShell, Microsoft Graph, Entra ID, Intune, Tenant migration"
+}
+  </script>
+</head>
+<body class="article-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="Kamruzzaman Akib, home">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <span class="brand-name">Kamruzzaman Akib</span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#experience">Experience</a></li>
+          <li><a href="../index.html#projects">Projects</a></li>
+          <li><a href="../articles/index.html" class="active" aria-current="page">Articles</a></li>
+          <li><a href="../scripts/index.html">Scripts</a></li>
+          <li><a href="../index.html#skills">Skills</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <article class="article">
+      <header class="article-hero">
+        <div class="container article-narrow">
+          <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a><span aria-hidden="true">/</span><a href="index.html">Articles</a><span aria-hidden="true">/</span><span>PowerShell &amp; Microsoft 365</span></nav>
+          <p class="article-cat">PowerShell &amp; Microsoft 365</p>
+          <h1>Copy Entra ID groups to another tenant with PowerShell (export, import and clean-up)</h1>
+          <p class="article-summary">Three Microsoft Graph PowerShell scripts for a tenant-to-tenant move: export every group to CSV, recreate them in the new tenant with a dry run and an old-to-new ID map, and delete a group by ID when you need to clean up.</p>
+          <p class="article-meta">By Kamruzzaman Akib · 5 min read</p>
+          <ul class="chips"><li>PowerShell</li><li>Microsoft Graph</li><li>Entra ID</li><li>Intune</li><li>Tenant migration</li></ul>
+        </div>
+      </header>
+      <div class="container article-narrow article-body">
+        <aside class="provenance" role="note"><strong>About this article.</strong> I wrote the scripts in this article for my day-to-day admin work. The public versions have personal file paths removed and were tidied for sharing, and examples use Microsoft’s fictional <code>contoso.com</code> domain. As with any admin script, try it in a test or non-production tenant before you rely on it.</aside>
+
+<p>In a tenant-to-tenant migration, the groups that Intune apps, configuration profiles and licences are assigned to have to exist in the new tenant before you can assign anything. Rebuilding dozens of them by hand is slow and easy to get wrong, so I scripted it: one script exports the groups from the source tenant, a second recreates them in the destination tenant, and a third deletes a group by ID when you need to tidy up after a test run.</p>
+
+<h2>What gets copied</h2>
+<p><strong>Copied:</strong> name, description, mail nickname, group type (security or Microsoft 365), visibility, and the membership rule of dynamic groups.</p>
+<p><strong>Not copied:</strong> members, owners, and the Intune or licence assignments themselves. Distribution lists and mail-enabled security groups are skipped too, because Microsoft Graph can only create security groups and Microsoft 365 groups. Create those in Exchange Online instead (see <a href="bulk-distribution-groups-exchange.html">Bulk create distribution groups in Exchange Online</a>).</p>
+
+<h2>What you need</h2>
+<ul>
+  <li>The Microsoft Graph PowerShell SDK: <code>Install-Module Microsoft.Graph -Scope CurrentUser</code>.</li>
+  <li>In the source tenant, an account that can read groups (permission <code>Group.Read.All</code>).</li>
+  <li>In the destination tenant, an account allowed to create groups, for example a Groups Administrator (permission <code>Group.ReadWrite.All</code>).</li>
+</ul>
+
+<h2>Step 1: Export the groups from the source tenant</h2>
+<div class="script-block"><div class="script-head"><code class="script-name">Export-EntraGroups.ps1</code><span class="script-head-links"><a href="../scripts/index.html#export-entragroups">In the script library</a><a class="btn btn-primary btn-small" href="../scripts/Export-EntraGroups.ps1" download>Download</a></span></div><details><summary>Show the full script (57 lines)</summary><pre><code class="lang-powershell">&lt;#
+.SYNOPSIS
+    Exports Microsoft Entra ID groups (the groups Intune apps and policies are assigned to)
+    to a CSV file, so they can be recreated in another tenant.
+
+.DESCRIPTION
+    First half of a tenant-to-tenant group copy. For each group it saves the name,
+    description, mail nickname, group type, visibility and, for dynamic groups, the
+    membership rule. Import-EntraGroups.ps1 reads this file in the destination tenant.
+
+    Members, owners and assignments are not exported.
+
+.PARAMETER OutputPath
+    Where to save the CSV file. Default: groups.csv in the current folder.
+
+.EXAMPLE
+    .\Export-EntraGroups.ps1 -OutputPath .\groups.csv
+
+.NOTES
+    Author      : Kamruzzaman Akib
+    Modules     : Microsoft.Graph.Authentication, Microsoft.Graph.Groups
+    Permissions : Group.Read.All (delegated)
+    Sign in to the SOURCE tenant when prompted.
+#&gt;
+#Requires -Modules Microsoft.Graph.Authentication, Microsoft.Graph.Groups
+
+[CmdletBinding()]
+param(
+    [string]$OutputPath = &#x27;.\groups.csv&#x27;
+)
+
+Connect-MgGraph -Scopes &#x27;Group.Read.All&#x27; -NoWelcome -ErrorAction Stop
+Write-Host &quot;Connected to tenant $((Get-MgContext).TenantId)&quot; -ForegroundColor Cyan
+
+$properties = &#x27;Id&#x27;, &#x27;DisplayName&#x27;, &#x27;Description&#x27;, &#x27;MailNickname&#x27;, &#x27;MailEnabled&#x27;, &#x27;SecurityEnabled&#x27;,
+              &#x27;GroupTypes&#x27;, &#x27;Visibility&#x27;, &#x27;MembershipRule&#x27;, &#x27;MembershipRuleProcessingState&#x27;
+
+$groups = @(Get-MgGroup -All -Property $properties -ErrorAction Stop)
+
+$groups | ForEach-Object {
+    [PSCustomObject]@{
+        ObjectId                      = $_.Id
+        DisplayName                   = $_.DisplayName
+        Description                   = $_.Description
+        MailNickname                  = $_.MailNickname
+        MailEnabled                   = $_.MailEnabled
+        SecurityEnabled               = $_.SecurityEnabled
+        GroupTypes                    = $_.GroupTypes -join &#x27;;&#x27;
+        Visibility                    = $_.Visibility
+        MembershipRule                = $_.MembershipRule
+        MembershipRuleProcessingState = $_.MembershipRuleProcessingState
+    }
+} | Export-Csv -Path $OutputPath -NoTypeInformation -Encoding UTF8
+
+Write-Host &quot;Exported $($groups.Count) groups to $((Resolve-Path -Path $OutputPath).Path)&quot; -ForegroundColor Green
+
+Disconnect-MgGraph | Out-Null</code></pre></details></div>
+<pre><code class="lang-powershell">.\Export-EntraGroups.ps1 -OutputPath .\groups.csv</code></pre>
+<p>Sign in with your source-tenant account. The script prints the tenant ID it connected to, so you can check you’re in the right place before anything else happens.</p>
+
+<h2>Step 2: Review the CSV</h2>
+<ul>
+  <li>Delete the rows for groups you don’t want to bring across, such as old test groups or groups that will arrive another way (for example, synced from on-premises Active Directory).</li>
+  <li>Check the dynamic membership rules. A rule that uses a custom directory extension (<code>extension_&lt;app ID&gt;_…</code>) points at an app in the old tenant and has to be rewritten.</li>
+  <li>Mail nicknames of Microsoft 365 groups must be unique in the destination tenant.</li>
+</ul>
+
+<h2>Step 3: Recreate the groups in the destination tenant</h2>
+<div class="script-block"><div class="script-head"><code class="script-name">Import-EntraGroups.ps1</code><span class="script-head-links"><a href="../scripts/index.html#import-entragroups">In the script library</a><a class="btn btn-primary btn-small" href="../scripts/Import-EntraGroups.ps1" download>Download</a></span></div><details><summary>Show the full script (124 lines)</summary><pre><code class="lang-powershell">&lt;#
+.SYNOPSIS
+    Recreates Microsoft Entra ID groups from a CSV made by Export-EntraGroups.ps1.
+
+.DESCRIPTION
+    Second half of a tenant-to-tenant group copy. Run it while signed in to the
+    DESTINATION tenant. For each row it creates a security group or Microsoft 365
+    group with the same name, description, mail nickname, visibility and (for
+    dynamic groups) membership rule.
+
+    It skips:
+      - groups whose name already exists in the destination tenant, so the script
+        is safe to run again;
+      - distribution lists and mail-enabled security groups, because Microsoft Graph
+        cannot create them (create them in Exchange Online instead).
+
+    It also writes &lt;CsvPath&gt;-id-map.csv with the old and new group IDs, which helps
+    when you recreate Intune assignments.
+
+    Run it with -WhatIf first to see what would be created.
+
+.PARAMETER CsvPath
+    Path to the CSV file created by Export-EntraGroups.ps1.
+
+.EXAMPLE
+    .\Import-EntraGroups.ps1 -CsvPath .\groups.csv -WhatIf
+
+.EXAMPLE
+    .\Import-EntraGroups.ps1 -CsvPath .\groups.csv
+
+.NOTES
+    Author      : Kamruzzaman Akib
+    Modules     : Microsoft.Graph.Authentication, Microsoft.Graph.Groups
+    Permissions : Group.ReadWrite.All (delegated)
+    Members and owners are not copied.
+#&gt;
+#Requires -Modules Microsoft.Graph.Authentication, Microsoft.Graph.Groups
+
+[CmdletBinding(SupportsShouldProcess)]
+param(
+    [Parameter(Mandatory)]
+    [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
+    [string]$CsvPath
+)
+
+$rows = @(Import-Csv -Path $CsvPath)
+if ($rows.Count -eq 0) {
+    throw &quot;The CSV file &#x27;$CsvPath&#x27; is empty.&quot;
+}
+
+Connect-MgGraph -Scopes &#x27;Group.ReadWrite.All&#x27; -NoWelcome -ErrorAction Stop
+Write-Host &quot;Connected to tenant $((Get-MgContext).TenantId)&quot; -ForegroundColor Cyan
+
+$created = 0; $skipped = 0; $failed = 0
+$idMap = New-Object System.Collections.Generic.List[object]
+
+foreach ($row in $rows) {
+    $name = $row.DisplayName
+    if (-not $name) { continue }
+
+    $groupTypes      = @($row.GroupTypes -split &#x27;;&#x27; | Where-Object { $_ })
+    $mailEnabled     = ($row.MailEnabled -eq &#x27;True&#x27;)
+    $securityEnabled = ($row.SecurityEnabled -eq &#x27;True&#x27;)
+
+    # Microsoft Graph can only create Microsoft 365 groups and security groups.
+    if ($mailEnabled -and ($groupTypes -notcontains &#x27;Unified&#x27;)) {
+        Write-Warning &quot;Skipped &#x27;$name&#x27;: distribution lists and mail-enabled security groups must be created in Exchange Online.&quot;
+        $skipped++
+        continue
+    }
+
+    # Do not create a second group with the same name.
+    $filterName = $name -replace &quot;&#x27;&quot;, &quot;&#x27;&#x27;&quot;
+    $existing = Get-MgGroup -Filter &quot;displayName eq &#x27;$filterName&#x27;&quot; -Top 1 -ErrorAction SilentlyContinue
+    if ($existing) {
+        Write-Host &quot;Skipped &#x27;$name&#x27;: a group with this name already exists.&quot; -ForegroundColor DarkGray
+        $skipped++
+        continue
+    }
+
+    # Mail nickname is required. Make one from the name if the CSV has none.
+    $mailNickname = $row.MailNickname
+    if (-not $mailNickname) {
+        $mailNickname = ($name -replace &#x27;[^a-zA-Z0-9]&#x27;, &#x27;&#x27;)
+        if (-not $mailNickname) { $mailNickname = &#x27;group&#x27; + (Get-Random -Maximum 999999) }
+    }
+
+    $params = @{
+        DisplayName     = $name
+        MailNickname    = $mailNickname
+        MailEnabled     = $mailEnabled
+        SecurityEnabled = $securityEnabled
+    }
+    if ($groupTypes.Count -gt 0) { $params.GroupTypes = $groupTypes }
+    if ($row.Description -and $row.Description -ne &#x27;.&#x27;) { $params.Description = $row.Description }
+    if ($row.Visibility) { $params.Visibility = $row.Visibility }
+    if ($row.MembershipRule) {
+        $params.MembershipRule = $row.MembershipRule
+        $params.MembershipRuleProcessingState = if ($row.MembershipRuleProcessingState) { $row.MembershipRuleProcessingState } else { &#x27;On&#x27; }
+    }
+
+    if ($PSCmdlet.ShouldProcess($name, &#x27;Create group&#x27;)) {
+        try {
+            $newGroup = New-MgGroup @params -ErrorAction Stop
+            Write-Host &quot;Created &#x27;$name&#x27; ($($newGroup.Id))&quot; -ForegroundColor Green
+            $idMap.Add([PSCustomObject]@{ DisplayName = $name; OldId = $row.ObjectId; NewId = $newGroup.Id })
+            $created++
+        } catch {
+            Write-Warning &quot;Failed to create &#x27;$name&#x27;: $($_.Exception.Message)&quot;
+            $failed++
+        }
+    }
+}
+
+if ($idMap.Count -gt 0) {
+    $mapPath = [System.IO.Path]::ChangeExtension((Resolve-Path -Path $CsvPath).Path, $null).TrimEnd(&#x27;.&#x27;) + &#x27;-id-map.csv&#x27;
+    $idMap | Export-Csv -Path $mapPath -NoTypeInformation -Encoding UTF8
+    Write-Host &quot;Old and new group IDs saved to $mapPath&quot; -ForegroundColor Cyan
+}
+
+Write-Host &#x27;&#x27;
+Write-Host &quot;Done. Created: $created   Skipped: $skipped   Failed: $failed&quot; -ForegroundColor Cyan
+
+Disconnect-MgGraph | Out-Null</code></pre></details></div>
+<p>Sign in with your destination-tenant account and do a dry run first. Nothing is created; you see a “What if” line for each group:</p>
+<pre><code class="lang-powershell">.\Import-EntraGroups.ps1 -CsvPath .\groups.csv -WhatIf</code></pre>
+<p>Then run it for real:</p>
+<pre><code class="lang-powershell">.\Import-EntraGroups.ps1 -CsvPath .\groups.csv</code></pre>
+<ul>
+  <li>Groups whose name already exists are skipped, so you can safely run it again after fixing a problem.</li>
+  <li>It saves <code>groups-id-map.csv</code> with each group’s old and new ID. Keep it: you need it when you recreate Intune assignments or update anything that refers to a group by ID.</li>
+  <li>When an admin creates a Microsoft 365 group, Graph adds that admin as an owner automatically; security groups get no owner. Review owners afterwards.</li>
+</ul>
+
+<h2>Step 4: Clean up a group by ID (if you need to)</h2>
+<div class="script-block"><div class="script-head"><code class="script-name">Remove-EntraGroup.ps1</code><span class="script-head-links"><a href="../scripts/index.html#remove-entragroup">In the script library</a><a class="btn btn-primary btn-small" href="../scripts/Remove-EntraGroup.ps1" download>Download</a></span></div><details><summary>Show the full script (64 lines)</summary><pre><code class="lang-powershell">&lt;#
+.SYNOPSIS
+    Deletes a Microsoft Entra ID group by its object ID.
+
+.DESCRIPTION
+    Handy for cleaning up after a test import, or for removing a group straight
+    through Microsoft Graph when the admin centre is slow or unhelpful.
+    It looks the group up first, shows its name and asks you to confirm.
+    Use -Force to skip the confirmation prompt (for example, in a loop).
+
+    Microsoft 365 groups can be restored for 30 days after deletion.
+    Treat any other group type as permanently deleted.
+
+.PARAMETER GroupId
+    Object ID of the group, as shown in the Entra or Intune admin centre.
+
+.PARAMETER Force
+    Delete without asking for confirmation.
+
+.EXAMPLE
+    .\Remove-EntraGroup.ps1 -GroupId 3f2a6b1c-0d4e-4f5a-9b8c-7d6e5f4a3b2c
+
+.EXAMPLE
+    .\Remove-EntraGroup.ps1 -GroupId 3f2a6b1c-0d4e-4f5a-9b8c-7d6e5f4a3b2c -WhatIf
+
+.NOTES
+    Author      : Kamruzzaman Akib
+    Modules     : Microsoft.Graph.Authentication, Microsoft.Graph.Groups
+    Permissions : Group.ReadWrite.All (delegated)
+#&gt;
+#Requires -Modules Microsoft.Graph.Authentication, Microsoft.Graph.Groups
+
+[CmdletBinding(SupportsShouldProcess, ConfirmImpact = &#x27;High&#x27;)]
+param(
+    [Parameter(Mandatory, HelpMessage = &#x27;Object ID of the group to delete&#x27;)]
+    [ValidatePattern(&#x27;^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$&#x27;)]
+    [string]$GroupId,
+
+    [switch]$Force
+)
+
+if ($Force -and -not $PSBoundParameters.ContainsKey(&#x27;Confirm&#x27;)) {
+    $ConfirmPreference = &#x27;None&#x27;
+}
+
+Connect-MgGraph -Scopes &#x27;Group.ReadWrite.All&#x27; -NoWelcome -ErrorAction Stop
+
+try {
+    $group = Get-MgGroup -GroupId $GroupId -Property Id, DisplayName, GroupTypes -ErrorAction Stop
+} catch {
+    Write-Error &quot;No group found with ID $GroupId. $($_.Exception.Message)&quot;
+    return
+}
+
+$kind = if ($group.GroupTypes -contains &#x27;Unified&#x27;) { &#x27;Microsoft 365 group&#x27; } else { &#x27;group&#x27; }
+
+if ($PSCmdlet.ShouldProcess(&quot;$($group.DisplayName) ($GroupId)&quot;, &quot;Delete $kind&quot;)) {
+    try {
+        Remove-MgGroup -GroupId $GroupId -Confirm:$false -ErrorAction Stop
+        Write-Host &quot;Deleted $kind &#x27;$($group.DisplayName)&#x27; ($GroupId).&quot; -ForegroundColor Green
+    } catch {
+        Write-Error &quot;Could not delete &#x27;$($group.DisplayName)&#x27;: $($_.Exception.Message)&quot;
+    }
+}</code></pre></details></div>
+<pre><code class="lang-powershell">.\Remove-EntraGroup.ps1 -GroupId 3f2a6b1c-0d4e-4f5a-9b8c-7d6e5f4a3b2c</code></pre>
+<p>The script looks the group up, shows its name and asks you to confirm. <code>-WhatIf</code> shows what would happen; <code>-Force</code> skips the prompt. To undo a whole test import, feed it the ID map (try it with <code>-WhatIf</code> first):</p>
+<pre><code class="lang-powershell">Import-Csv .\groups-id-map.csv | ForEach-Object { .\Remove-EntraGroup.ps1 -GroupId $_.NewId -Force }</code></pre>
+<aside class="callout warn">Deleted Microsoft 365 groups can be restored for 30 days from <em>Deleted groups</em> in the Entra admin centre. Treat any other kind of group as gone for good.</aside>
+
+        <nav class="article-pager" aria-label="More articles"><a class="pager-prev" href="bulk-download-onedrive.html"><span>Previous</span>Bulk download every user&#x27;s OneDrive with PowerShell and Microsoft Graph</a><a class="pager-next" href="gam-google-chat-api.html"><span>Next</span>Enable the Google Chat API for GAM (and export every Chat space)</a></nav>
+        <p class="back-link"><a href="index.html">← All articles</a></p>
+      </div>
+    </article>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Kamruzzaman Akib. Built with plain HTML, CSS and JavaScript, hosted free on GitHub Pages.</p>
+      <p><a href="../index.html">Home</a> · <a href="../articles/index.html">All articles</a> · <a href="../scripts/index.html">Scripts</a> · <a href="#top">Back to top</a></p>
+    </div>
+  </footer>
+  <script src="../assets/js/main.js" defer></script>
+</body>
+</html>

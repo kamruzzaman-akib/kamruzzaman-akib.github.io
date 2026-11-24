@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bulk create distribution groups in Exchange Online from a CSV | Kamruzzaman Akib</title>
+  <meta name="description" content="Create many Exchange Online distribution lists in one run, with owners, members and notes, from a CSV using the ExchangeOnlineManagement module. Each group is reported as SUCCESS or FAILED.">
+  <meta name="author" content="Kamruzzaman Akib">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="canonical" href="https://kamruzzamanakib.github.io/articles/bulk-distribution-groups-exchange.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Bulk create distribution groups in Exchange Online from a CSV | Kamruzzaman Akib">
+  <meta property="og:description" content="Create many Exchange Online distribution lists in one run, with owners, members and notes, from a CSV using the ExchangeOnlineManagement module. Each group is reported as SUCCESS or FAILED.">
+  <meta property="og:url" content="https://kamruzzamanakib.github.io/articles/bulk-distribution-groups-exchange.html">
+  <meta property="og:image" content="https://kamruzzamanakib.github.io/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script>
+    (function () { try { var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Bulk create distribution groups in Exchange Online from a CSV",
+  "description": "Create many Exchange Online distribution lists in one run, with owners, members and notes, from a CSV using the ExchangeOnlineManagement module. Each group is reported as SUCCESS or FAILED.",
+  "author": {
+    "@type": "Person",
+    "name": "Kamruzzaman Akib",
+    "url": "https://kamruzzamanakib.github.io/"
+  },
+  "url": "https://kamruzzamanakib.github.io/articles/bulk-distribution-groups-exchange.html",
+  "inLanguage": "en",
+  "keywords": "PowerShell, Exchange Online, Distribution lists, Automation"
+}
+  </script>
+</head>
+<body class="article-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="Kamruzzaman Akib, home">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <span class="brand-name">Kamruzzaman Akib</span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#experience">Experience</a></li>
+          <li><a href="../index.html#projects">Projects</a></li>
+          <li><a href="../articles/index.html" class="active" aria-current="page">Articles</a></li>
+          <li><a href="../scripts/index.html">Scripts</a></li>
+          <li><a href="../index.html#skills">Skills</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <article class="article">
+      <header class="article-hero">
+        <div class="container article-narrow">
+          <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a><span aria-hidden="true">/</span><a href="index.html">Articles</a><span aria-hidden="true">/</span><span>PowerShell &amp; Microsoft 365</span></nav>
+          <p class="article-cat">PowerShell &amp; Microsoft 365</p>
+          <h1>Bulk create distribution groups in Exchange Online from a CSV</h1>
+          <p class="article-summary">Create many Exchange Online distribution lists in one run, with owners, members and notes, from a CSV using the ExchangeOnlineManagement module. Each group is reported as SUCCESS or FAILED.</p>
+          <p class="article-meta">By Kamruzzaman Akib · 5 min read</p>
+          <ul class="chips"><li>PowerShell</li><li>Exchange Online</li><li>Distribution lists</li><li>Automation</li></ul>
+        </div>
+      </header>
+      <div class="container article-narrow article-body">
+        <aside class="provenance" role="note"><strong>About this article.</strong> I originally wrote this guide for my company’s internal knowledge base. This public version has company names, colleagues’ names and email addresses, internal domains and system details removed. Screenshots are shown at full size: click any of them to enlarge. Only the parts that showed people or company information are blurred. Example addresses use Microsoft’s fictional <code>contoso.com</code> domain.</aside>
+
+<p>This tutorial creates distribution groups in bulk from a CSV file with the <code>ExchangeOnlineManagement</code> module. It's useful when a team, office or newly acquired company needs a set of mailing lists created consistently.</p>
+
+<div class="callout warn"><strong>Don't use PowerShell ISE for this.</strong> <code>Connect-ExchangeOnline</code> often fails inside ISE with a “window handle must be configured” error (see <a href="https://learn.microsoft.com/en-us/answers/questions/2127369/when-i-run-the-connect-exchangeonline-to-connect-i" rel="noopener">Microsoft Q&amp;A</a>). Use the standard <strong>Windows PowerShell</strong> or PowerShell 7 console.
+<figure class="shot wide"><a href="img/bulk-distribution-groups-exchange/img05.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/bulk-distribution-groups-exchange/img05.jpg" alt="The error you get in PowerShell ISE" width="963" height="159" loading="lazy" decoding="async"></a><figcaption>The error you get in PowerShell ISE</figcaption></figure></div>
+
+<h2>Step 1: Prepare the CSV</h2>
+<p>The CSV has five columns:</p>
+<ul>
+  <li><strong>Name</strong>: the display name of the group, for example <em>HR Communications</em>.</li>
+  <li><strong>PrimarySmtpAddress</strong>: the group's email address, for example <em>hr@contoso.com</em>.</li>
+  <li><strong>Owners</strong>: one or more owner addresses, separated by commas.</li>
+  <li><strong>Members</strong>: one or more member addresses, separated by commas.</li>
+  <li><strong>Notes</strong>: the group description, for example <em>Official communication channel for the HR team</em>.</li>
+</ul>
+<pre><code class="lang-csv">Name,PrimarySmtpAddress,Owners,Members,Notes
+HR Communications,hr@contoso.com,"alex@contoso.com,megan@contoso.com","lee@contoso.com,megan@contoso.com",Official communication channel for the HR team
+Sales EMEA,sales-emea@contoso.com,alex@contoso.com,"nestor@contoso.com,lynne@contoso.com",EMEA sales team</code></pre>
+<figure class="shot wide"><a href="img/bulk-distribution-groups-exchange/img04.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/bulk-distribution-groups-exchange/img04.png" alt="A test CSV in Excel" width="1109" height="196" loading="lazy" decoding="async"></a><figcaption>A test CSV in Excel</figcaption></figure>
+
+<h2>Step 2: Install the module and connect</h2>
+<ol class="steps">
+  <li>Open a standard PowerShell window (run as administrator for the install) and run:
+<pre><code class="lang-powershell">Install-Module -Name ExchangeOnlineManagement</code></pre>
+  Type <kbd>A</kbd> and press <kbd>Enter</kbd> to confirm installing from PSGallery.
+  <figure class="shot wide"><a href="img/bulk-distribution-groups-exchange/img01.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/bulk-distribution-groups-exchange/img01.png" alt="Installing the module" width="976" height="128" loading="lazy" decoding="async"></a><figcaption>Installing the module</figcaption></figure></li>
+  <li>Connect and sign in with an account that has the <strong>Exchange Administrator</strong> (or Global Administrator) role:
+<pre><code class="lang-powershell">Connect-ExchangeOnline</code></pre>
+  <figure class="shot"><a href="img/bulk-distribution-groups-exchange/img02.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/bulk-distribution-groups-exchange/img02.jpg" alt="Sign in with an admin account" width="712" height="615" loading="lazy" decoding="async"></a><figcaption>Sign in with an admin account</figcaption></figure></li>
+</ol>
+
+<h2>Step 3: Run the script</h2>
+<p>Paste this into the same window, after changing the CSV path. It splits the owner and member lists, creates each group and prints <span class="ok">SUCCESS</span> or <span class="bad">FAILED</span> with the reason:</p>
+<pre><code class="lang-powershell">$groups = Import-Csv -Path "C:\Scripts\groups.csv"
+
+foreach ($group in $groups) {
+    # Split the comma-separated strings into arrays, trim spaces and drop empty entries
+    $ownersArray  = $group.Owners  -split ',' | ForEach-Object { $_.Trim() } | Where-Object { -not [string]::IsNullOrEmpty($_) }
+    $membersArray = $group.Members -split ',' | ForEach-Object { $_.Trim() } | Where-Object { -not [string]::IsNullOrEmpty($_) }
+
+    try {
+        Write-Host "Processing group: $($group.Name)"
+        New-DistributionGroup -Name $group.Name `
+            -PrimarySmtpAddress $group.PrimarySmtpAddress `
+            -ManagedBy $ownersArray `
+            -Members $membersArray `
+            -Notes $group.Notes `
+            -ErrorAction Stop
+        Write-Host "SUCCESS: Created $($group.Name)" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "FAILED: Could not create $($group.Name)." -ForegroundColor Red
+        Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
+    }
+}</code></pre>
+<figure class="shot"><a href="img/bulk-distribution-groups-exchange/img03.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/bulk-distribution-groups-exchange/img03.jpg" alt="Successful run" width="736" height="376" loading="lazy" decoding="async"></a><figcaption>Successful run</figcaption></figure>
+
+<h2>Step 4: Verify</h2>
+<p>Open the <a href="https://admin.cloud.microsoft/exchange?#/groups" rel="noopener">Exchange admin center → Groups</a> and check the <strong>Distribution list</strong> tab.</p>
+<figure class="shot"><a href="img/bulk-distribution-groups-exchange/img06.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/bulk-distribution-groups-exchange/img06.png" alt="The new groups in the Exchange admin center" width="712" height="401" loading="lazy" decoding="async"></a><figcaption>The new groups in the Exchange admin center</figcaption></figure>
+
+        <nav class="article-pager" aria-label="More articles"><a class="pager-prev" href="bulk-assign-m365-licences.html"><span>Previous</span>Bulk assign (and remove) Microsoft 365 licences with PowerShell and Microsoft Graph</a><a class="pager-next" href="bulk-download-onedrive.html"><span>Next</span>Bulk download every user&#x27;s OneDrive with PowerShell and Microsoft Graph</a></nav>
+        <p class="back-link"><a href="index.html">← All articles</a></p>
+      </div>
+    </article>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Kamruzzaman Akib. Built with plain HTML, CSS and JavaScript, hosted free on GitHub Pages.</p>
+      <p><a href="../index.html">Home</a> · <a href="../articles/index.html">All articles</a> · <a href="../scripts/index.html">Scripts</a> · <a href="#top">Back to top</a></p>
+    </div>
+  </footer>
+  <script src="../assets/js/main.js" defer></script>
+</body>
+</html>

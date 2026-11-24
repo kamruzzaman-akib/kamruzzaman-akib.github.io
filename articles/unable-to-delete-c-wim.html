@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Troubleshooting “Unable to delete C:\wim” | Kamruzzaman Akib</title>
+  <meta name="description" content="When a C:\wim folder can&#x27;t be deleted it&#x27;s usually a WIM image that was never unmounted. Use DISM to find, discard and clean up the mount, then delete the folder.">
+  <meta name="author" content="Kamruzzaman Akib">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="canonical" href="https://kamruzzamanakib.github.io/articles/unable-to-delete-c-wim.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Troubleshooting “Unable to delete C:\wim” | Kamruzzaman Akib">
+  <meta property="og:description" content="When a C:\wim folder can&#x27;t be deleted it&#x27;s usually a WIM image that was never unmounted. Use DISM to find, discard and clean up the mount, then delete the folder.">
+  <meta property="og:url" content="https://kamruzzamanakib.github.io/articles/unable-to-delete-c-wim.html">
+  <meta property="og:image" content="https://kamruzzamanakib.github.io/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script>
+    (function () { try { var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Troubleshooting “Unable to delete C:\\wim”",
+  "description": "When a C:\\wim folder can't be deleted it's usually a WIM image that was never unmounted. Use DISM to find, discard and clean up the mount, then delete the folder.",
+  "author": {
+    "@type": "Person",
+    "name": "Kamruzzaman Akib",
+    "url": "https://kamruzzamanakib.github.io/"
+  },
+  "url": "https://kamruzzamanakib.github.io/articles/unable-to-delete-c-wim.html",
+  "inLanguage": "en",
+  "keywords": "Windows, DISM, WIM, Troubleshooting"
+}
+  </script>
+</head>
+<body class="article-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="Kamruzzaman Akib, home">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <span class="brand-name">Kamruzzaman Akib</span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#experience">Experience</a></li>
+          <li><a href="../index.html#projects">Projects</a></li>
+          <li><a href="../articles/index.html" class="active" aria-current="page">Articles</a></li>
+          <li><a href="../scripts/index.html">Scripts</a></li>
+          <li><a href="../index.html#skills">Skills</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <article class="article">
+      <header class="article-hero">
+        <div class="container article-narrow">
+          <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a><span aria-hidden="true">/</span><a href="index.html">Articles</a><span aria-hidden="true">/</span><span>Windows &amp; endpoints</span></nav>
+          <p class="article-cat">Windows &amp; endpoints</p>
+          <h1>Troubleshooting “Unable to delete C:\wim”</h1>
+          <p class="article-summary">When a C:\wim folder can&#x27;t be deleted it&#x27;s usually a WIM image that was never unmounted. Use DISM to find, discard and clean up the mount, then delete the folder.</p>
+          <p class="article-meta">By Kamruzzaman Akib · 2 min read</p>
+          <ul class="chips"><li>Windows</li><li>DISM</li><li>WIM</li><li>Troubleshooting</li></ul>
+        </div>
+      </header>
+      <div class="container article-narrow article-body">
+        <aside class="provenance" role="note"><strong>About this article.</strong> I originally wrote this guide for my company’s internal knowledge base. This public version has company names, colleagues’ names and email addresses, internal domains and system details removed. Screenshots are shown at full size: click any of them to enlarge. Only the parts that showed people or company information are blurred. Example addresses use Microsoft’s fictional <code>contoso.com</code> domain.</aside>
+
+<p>If you can't delete a <code>C:\wim</code> folder, the cause is almost always a <strong>WIM image that is still mounted</strong> (it wasn't unmounted properly), plus permissions or files in use. I hit this on several laptops after image servicing work.</p>
+
+<h2>Prerequisites</h2>
+<ul>
+  <li>An account with <strong>administrator rights</strong> on the computer.</li>
+  <li>A <strong>bootable Windows USB stick</strong>, used for unmounting the image.</li>
+</ul>
+
+<h2>Fix</h2>
+<ol class="steps">
+  <li>Insert the bootable USB drive.</li>
+  <li>Open <strong>Command Prompt as administrator</strong>.</li>
+  <li>Check for mounted images:
+<pre><code class="lang-cmd">DISM /Get-MountedWimInfo</code></pre></li>
+  <li>If any images are listed, note the <strong>Mount Directory</strong>. It should be <code>C:\wim</code> or similar.</li>
+  <li>Unmount the image and <strong>discard</strong> changes (replace the path if yours differs):
+<pre><code class="lang-cmd">DISM /Unmount-Wim /MountDir:"C:\wim" /discard</code></pre>
+  <ul>
+    <li><code>/discard</code> throws away any changes made to the mounted image.</li>
+    <li><code>/commit</code> would save the changes. <strong>Don't use it here</strong>: it tries to find the original source the image was mounted from (often an old USB stick) and fails.</li>
+  </ul></li>
+  <li>Clean up any leftover mounts:
+<pre><code class="lang-cmd">DISM /Cleanup-Wim</code></pre></li>
+  <li>Delete the <code>C:\wim</code> folder again. It should now delete.</li>
+</ol>
+
+        <nav class="article-pager" aria-label="More articles"><a class="pager-prev" href="fix-user-profile-service.html"><span>Previous</span>Fix “The User Profile Service failed the sign-in” on Windows 11</a><a class="pager-next" href="win32-app-intune.html"><span>Next</span>Package and deploy a Win32 app with Microsoft Intune</a></nav>
+        <p class="back-link"><a href="index.html">← All articles</a></p>
+      </div>
+    </article>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Kamruzzaman Akib. Built with plain HTML, CSS and JavaScript, hosted free on GitHub Pages.</p>
+      <p><a href="../index.html">Home</a> · <a href="../articles/index.html">All articles</a> · <a href="../scripts/index.html">Scripts</a> · <a href="#top">Back to top</a></p>
+    </div>
+  </footer>
+  <script src="../assets/js/main.js" defer></script>
+</body>
+</html>

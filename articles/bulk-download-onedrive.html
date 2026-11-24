@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bulk download every user&#x27;s OneDrive with PowerShell and Microsoft Graph | Kamruzzaman Akib</title>
+  <meta name="description" content="Grant yourself Site Collection Admin on every OneDrive, download every file (keeping the folder structure) for one user, a CSV list or the whole organisation, then remove your access. Two downloadable scripts, written for a tenant-to-tenant migration.">
+  <meta name="author" content="Kamruzzaman Akib">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="canonical" href="https://kamruzzamanakib.github.io/articles/bulk-download-onedrive.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Bulk download every user&#x27;s OneDrive with PowerShell and Microsoft Graph | Kamruzzaman Akib">
+  <meta property="og:description" content="Grant yourself Site Collection Admin on every OneDrive, download every file (keeping the folder structure) for one user, a CSV list or the whole organisation, then remove your access. Two downloadable scripts, written for a tenant-to-tenant migration.">
+  <meta property="og:url" content="https://kamruzzamanakib.github.io/articles/bulk-download-onedrive.html">
+  <meta property="og:image" content="https://kamruzzamanakib.github.io/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script>
+    (function () { try { var t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Bulk download every user's OneDrive with PowerShell and Microsoft Graph",
+  "description": "Grant yourself Site Collection Admin on every OneDrive, download every file (keeping the folder structure) for one user, a CSV list or the whole organisation, then remove your access. Two downloadable scripts, written for a tenant-to-tenant migration.",
+  "author": {
+    "@type": "Person",
+    "name": "Kamruzzaman Akib",
+    "url": "https://kamruzzamanakib.github.io/"
+  },
+  "url": "https://kamruzzamanakib.github.io/articles/bulk-download-onedrive.html",
+  "inLanguage": "en",
+  "keywords": "PowerShell, Microsoft Graph, SharePoint Online, OneDrive, Migration"
+}
+  </script>
+</head>
+<body class="article-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="Kamruzzaman Akib, home">
+        <span class="brand-mark" aria-hidden="true">KA</span>
+        <span class="brand-name">Kamruzzaman Akib</span>
+      </a>
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="../index.html#about">About</a></li>
+          <li><a href="../index.html#experience">Experience</a></li>
+          <li><a href="../index.html#projects">Projects</a></li>
+          <li><a href="../articles/index.html" class="active" aria-current="page">Articles</a></li>
+          <li><a href="../scripts/index.html">Scripts</a></li>
+          <li><a href="../index.html#skills">Skills</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark mode">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <article class="article">
+      <header class="article-hero">
+        <div class="container article-narrow">
+          <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a><span aria-hidden="true">/</span><a href="index.html">Articles</a><span aria-hidden="true">/</span><span>PowerShell &amp; Microsoft 365</span></nav>
+          <p class="article-cat">PowerShell &amp; Microsoft 365</p>
+          <h1>Bulk download every user&#x27;s OneDrive with PowerShell and Microsoft Graph</h1>
+          <p class="article-summary">Grant yourself Site Collection Admin on every OneDrive, download every file (keeping the folder structure) for one user, a CSV list or the whole organisation, then remove your access. Two downloadable scripts, written for a tenant-to-tenant migration.</p>
+          <p class="article-meta">By Kamruzzaman Akib · 8 min read</p>
+          <ul class="chips"><li>PowerShell</li><li>Microsoft Graph</li><li>SharePoint Online</li><li>OneDrive</li><li>Migration</li></ul>
+        </div>
+      </header>
+      <div class="container article-narrow article-body">
+        <aside class="provenance" role="note"><strong>About this article.</strong> I originally wrote this guide for my company’s internal knowledge base. This public version has company names, colleagues’ names and email addresses, internal domains and system details removed. Screenshots are shown at full size: click any of them to enlarge. Only the parts that showed people or company information are blurred. Example addresses use Microsoft’s fictional <code>contoso.com</code> domain.</aside>
+
+<p>I built this for a tenant migration, where every user's OneDrive had to be exported before the old tenant was closed. It downloads <strong>all files from all users' OneDrives</strong> and keeps the folder structure.</p>
+
+<div class="callout warn"><strong>Before you begin</strong>
+<ul>
+  <li><strong>Permissions:</strong> you need Global Administrator or SharePoint Administrator, <em>and</em> Site Collection Administrator on each OneDrive (step 2). Both scripts are in my <a href="../scripts/index.html#add-onedrivesiteadmin">script library</a>.</li>
+  <li><strong>Time:</strong> a large organisation can take hours or days.</li>
+  <li><strong>Disk space:</strong> at least as much free space as the total size of all OneDrives.</li>
+  <li><strong>Ethics and law:</strong> this is personal and company data. Follow your organisation's policies and data-protection rules, and get approval before you start.</li>
+</ul></div>
+
+<h2>Step 1: Install the modules</h2>
+<pre><code class="lang-powershell">Install-Module Microsoft.Online.SharePoint.PowerShell -Scope CurrentUser
+Install-Module Microsoft.Graph.Authentication, Microsoft.Graph.Users, Microsoft.Graph.Files -Scope CurrentUser</code></pre>
+
+<h2>Step 2: Make yourself Site Collection Admin on every OneDrive</h2>
+<p>This is the <strong>most important</strong> step. Even Global and SharePoint admins can't read a user's OneDrive without explicit Site Collection Administrator rights. <code>Add-OneDriveSiteAdmin.ps1</code> lists every OneDrive in the tenant and adds your account to each one. Run it with <code>-WhatIf</code> first to see the list:</p>
+<pre><code class="lang-powershell">.\Add-OneDriveSiteAdmin.ps1 -AdminUrl https://contoso-admin.sharepoint.com -UserPrincipalName admin@contoso.com -WhatIf
+.\Add-OneDriveSiteAdmin.ps1 -AdminUrl https://contoso-admin.sharepoint.com -UserPrincipalName admin@contoso.com</code></pre>
+<div class="script-block"><div class="script-head"><code class="script-name">Add-OneDriveSiteAdmin.ps1</code><span class="script-head-links"><a href="../scripts/index.html#add-onedrivesiteadmin">In the script library</a><a class="btn btn-primary btn-small" href="../scripts/Add-OneDriveSiteAdmin.ps1" download>Download</a></span></div><details><summary>Show the full script (92 lines)</summary><pre><code class="lang-powershell">&lt;#
+.SYNOPSIS
+    Adds (or removes) one account as Site Collection Administrator on every OneDrive
+    in the tenant.
+
+.DESCRIPTION
+    Global and SharePoint administrators cannot open another user&#x27;s OneDrive until
+    they are a Site Collection Administrator on it. This script lists every OneDrive
+    (personal site) in the tenant and grants that right to one account, so a bulk
+    export such as Export-OneDriveFiles.ps1 can read the files.
+
+    When the export is finished, run it again with -Remove to take the access away.
+
+    Run it with -WhatIf first to see which OneDrives would change.
+
+.PARAMETER AdminUrl
+    Your SharePoint admin centre URL, for example https://contoso-admin.sharepoint.com
+
+.PARAMETER UserPrincipalName
+    The account to add (or remove) as Site Collection Administrator.
+
+.PARAMETER Remove
+    Removes the account as Site Collection Administrator instead of adding it.
+
+.EXAMPLE
+    .\Add-OneDriveSiteAdmin.ps1 -AdminUrl https://contoso-admin.sharepoint.com -UserPrincipalName admin@contoso.com -WhatIf
+    Dry run: lists the OneDrives that would change.
+
+.EXAMPLE
+    .\Add-OneDriveSiteAdmin.ps1 -AdminUrl https://contoso-admin.sharepoint.com -UserPrincipalName admin@contoso.com -Remove
+    Takes the access away again after the export.
+
+.NOTES
+    Author     : Kamruzzaman Akib
+    Module     : Microsoft.Online.SharePoint.PowerShell (run it in Windows PowerShell 5.1)
+    Admin role : SharePoint Administrator or Global Administrator
+    Access to personal files is sensitive. Get written approval first, and remove
+    the access as soon as the work is done.
+#&gt;
+#Requires -Modules Microsoft.Online.SharePoint.PowerShell
+
+[CmdletBinding(SupportsShouldProcess)]
+param(
+    [Parameter(Mandatory)]
+    [ValidatePattern(&#x27;^https://[\w-]+-admin\.sharepoint\.[a-z.]+/?$&#x27;)]
+    [string]$AdminUrl,
+
+    [Parameter(Mandatory)]
+    [string]$UserPrincipalName,
+
+    [switch]$Remove
+)
+
+Connect-SPOService -Url $AdminUrl -ErrorAction Stop
+
+Write-Host &#x27;Listing every OneDrive in the tenant. This can take a few minutes...&#x27; -ForegroundColor Cyan
+$sites = @(Get-SPOSite -IncludePersonalSite $true -Limit All -Filter &quot;Url -like &#x27;-my.sharepoint.com/personal/&#x27;&quot; -ErrorAction Stop)
+Write-Host &quot;Found $($sites.Count) OneDrives.&quot; -ForegroundColor Cyan
+
+$grant  = -not $Remove
+$action = if ($grant) { &#x27;Add as Site Collection Administrator&#x27; } else { &#x27;Remove as Site Collection Administrator&#x27; }
+$changed = 0
+$failed  = 0
+$i       = 0
+
+foreach ($site in $sites) {
+    $i++
+    Write-Progress -Activity $action -Status $site.Url -PercentComplete ($i / $sites.Count * 100)
+
+    if (-not $PSCmdlet.ShouldProcess($site.Url, &quot;$action ($UserPrincipalName)&quot;)) { continue }
+
+    try {
+        $null = Set-SPOUser -Site $site.Url -LoginName $UserPrincipalName -IsSiteCollectionAdmin $grant -ErrorAction Stop
+        $changed++
+        Write-Verbose &quot;Done: $($site.Url)&quot;
+    }
+    catch {
+        $failed++
+        Write-Warning &quot;Failed on $($site.Url): $($_.Exception.Message)&quot;
+    }
+}
+Write-Progress -Activity $action -Completed
+
+Write-Host &#x27;&#x27;
+Write-Host &quot;OneDrives found : $($sites.Count)&quot;
+Write-Host &quot;Changed         : $changed&quot; -ForegroundColor Green
+if ($failed) { Write-Host &quot;Failed          : $failed&quot; -ForegroundColor Red }
+if ($grant -and $changed) {
+    Write-Host &#x27;When the export is finished, run this again with -Remove to take the access away.&#x27; -ForegroundColor Yellow
+}
+
+Disconnect-SPOService</code></pre></details></div>
+<p>The first version of this script asked for the admin URL and your UPN when it started:</p>
+<figure class="shot"><a href="img/bulk-download-onedrive/img05.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/bulk-download-onedrive/img05.png" alt="The script asks for the admin URL and your UPN" width="450" height="55" loading="lazy" decoding="async"></a><figcaption>The script asks for the admin URL and your UPN</figcaption></figure>
+<figure class="shot"><a href="img/bulk-download-onedrive/img06.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/bulk-download-onedrive/img06.jpg" alt="Adding Site Collection Admin across all OneDrives" width="737" height="299" loading="lazy" decoding="async"></a><figcaption>Adding Site Collection Admin across all OneDrives</figcaption></figure>
+
+<h2>Step 3: Download the files</h2>
+<p><code>Export-OneDriveFiles.ps1</code> walks each OneDrive folder by folder and saves the files under <code>&lt;ExportPath&gt;\&lt;UPN&gt;</code>, keeping the folder structure. I originally had three separate scripts (one user, a CSV list, the whole organisation); this version does all three:</p>
+<pre><code class="lang-powershell"># One user (or several, separated by commas)
+.\Export-OneDriveFiles.ps1 -UserPrincipalName alex.wilber@contoso.com -ExportPath D:\OneDriveExport
+
+# Everyone in a CSV file with a UserPrincipalName column
+.\Export-OneDriveFiles.ps1 -CsvPath .\users.csv -ExportPath D:\OneDriveExport
+
+# Every member account in the tenant (guests are skipped)
+.\Export-OneDriveFiles.ps1 -AllUsers -ExportPath D:\OneDriveExport</code></pre>
+<div class="script-block"><div class="script-head"><code class="script-name">Export-OneDriveFiles.ps1</code><span class="script-head-links"><a href="../scripts/index.html#export-onedrivefiles">In the script library</a><a class="btn btn-primary btn-small" href="../scripts/Export-OneDriveFiles.ps1" download>Download</a></span></div><details><summary>Show the full script (181 lines)</summary><pre><code class="lang-powershell">&lt;#
+.SYNOPSIS
+    Downloads users&#x27; OneDrive files to a local folder, keeping the folder structure.
+
+.DESCRIPTION
+    Built for a tenant migration, where every OneDrive had to be exported before the
+    old tenant was closed. Choose who to export in one of three ways:
+
+      -UserPrincipalName   one or more users
+      -CsvPath             a CSV file with a UserPrincipalName (or UPN) column
+      -AllUsers            every member account in the tenant (guests are skipped)
+
+    Each user&#x27;s files are saved to &lt;ExportPath&gt;\&lt;UPN&gt;\ with the same folders as in
+    OneDrive. Files that are already there with the same size are skipped, so you can
+    stop the script and run it again to carry on where it left off.
+
+    You must be Site Collection Administrator on each OneDrive first (see
+    Add-OneDriveSiteAdmin.ps1), otherwise that OneDrive is reported as not accessible.
+
+.PARAMETER UserPrincipalName
+    One or more users to export.
+
+.PARAMETER CsvPath
+    A CSV file with a column named UserPrincipalName or UPN.
+
+.PARAMETER AllUsers
+    Export every member account in the tenant.
+
+.PARAMETER ExportPath
+    Local folder to save the files in. It is created if it does not exist.
+
+.EXAMPLE
+    .\Export-OneDriveFiles.ps1 -UserPrincipalName alex.wilber@contoso.com -ExportPath D:\OneDriveExport
+
+.EXAMPLE
+    .\Export-OneDriveFiles.ps1 -CsvPath .\users.csv -ExportPath D:\OneDriveExport
+
+.EXAMPLE
+    .\Export-OneDriveFiles.ps1 -AllUsers -ExportPath D:\OneDriveExport
+
+.NOTES
+    Author      : Kamruzzaman Akib
+    Modules     : Microsoft.Graph.Authentication, Microsoft.Graph.Users, Microsoft.Graph.Files
+    Permissions : Files.Read.All, User.Read.All (delegated)
+    Replaces my three earlier scripts (single user, CSV list, whole organisation).
+    OneNote notebooks are listed as not exported: export them from OneNote instead.
+    Paths longer than 260 characters can fail unless Windows long paths are enabled.
+#&gt;
+#Requires -Modules Microsoft.Graph.Authentication, Microsoft.Graph.Users, Microsoft.Graph.Files
+
+[CmdletBinding(DefaultParameterSetName = &#x27;User&#x27;)]
+param(
+    [Parameter(Mandatory, ParameterSetName = &#x27;User&#x27;)]
+    [string[]]$UserPrincipalName,
+
+    [Parameter(Mandatory, ParameterSetName = &#x27;Csv&#x27;)]
+    [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
+    [string]$CsvPath,
+
+    [Parameter(Mandatory, ParameterSetName = &#x27;All&#x27;)]
+    [switch]$AllUsers,
+
+    [Parameter(Mandatory)]
+    [string]$ExportPath
+)
+
+$stats      = @{ Files = 0; AlreadyThere = 0; Failed = 0; Bytes = 0 }
+$notExported = [System.Collections.Generic.List[string]]::new()
+
+function Save-DriveFolder {
+    param(
+        [string]$DriveId,
+        [string]$ItemId,
+        [string]$LocalPath,
+        [switch]$IsRoot
+    )
+    New-Item -ItemType Directory -Path $LocalPath -Force | Out-Null
+
+    try {
+        # -All follows paging. Without it, folders with more than 200 items are cut short.
+        $children = Get-MgDriveItemChild -DriveId $DriveId -DriveItemId $ItemId -All -ErrorAction Stop
+    }
+    catch {
+        if ($IsRoot) { throw }
+        $script:stats.Failed++
+        Write-Warning &quot;Could not list $($LocalPath): $($_.Exception.Message)&quot;
+        return
+    }
+
+    foreach ($item in $children) {
+        $target = Join-Path -Path $LocalPath -ChildPath $item.Name
+
+        if ($item.Folder) {
+            Save-DriveFolder -DriveId $DriveId -ItemId $item.Id -LocalPath $target
+        }
+        elseif ($item.File) {
+            if ((Test-Path -LiteralPath $target) -and (Get-Item -LiteralPath $target).Length -eq $item.Size) {
+                $script:stats.AlreadyThere++
+                continue
+            }
+            try {
+                Get-MgDriveItemContent -DriveId $DriveId -DriveItemId $item.Id -OutFile $target -ErrorAction Stop
+                $script:stats.Files++
+                $script:stats.Bytes += $item.Size
+                Write-Verbose &quot;Downloaded $target&quot;
+            }
+            catch {
+                $script:stats.Failed++
+                Write-Warning &quot;Could not download $($target): $($_.Exception.Message)&quot;
+            }
+        }
+        else {
+            # OneNote notebooks and other packages are not plain files
+            $notExported.Add($target)
+        }
+    }
+}
+
+# --- Connect and work out who to export --------------------------------------
+Connect-MgGraph -Scopes &#x27;Files.Read.All&#x27;, &#x27;User.Read.All&#x27; -NoWelcome -ErrorAction Stop
+
+switch ($PSCmdlet.ParameterSetName) {
+    &#x27;User&#x27; {
+        $upns = $UserPrincipalName
+    }
+    &#x27;Csv&#x27; {
+        $rows = @(Import-Csv -Path $CsvPath)
+        if ($rows.Count -eq 0) { throw &quot;The CSV file &#x27;$CsvPath&#x27; is empty.&quot; }
+        $column = $rows[0].PSObject.Properties.Name |
+            Where-Object { $_ -in &#x27;UserPrincipalName&#x27;, &#x27;UPN&#x27; } |
+            Select-Object -First 1
+        if (-not $column) { throw &#x27;The CSV file needs a column named UserPrincipalName or UPN.&#x27; }
+        $upns = $rows.$column | Where-Object { $_ } | ForEach-Object { $_.Trim() }
+    }
+    &#x27;All&#x27; {
+        $upns = Get-MgUser -All -Filter &quot;userType eq &#x27;Member&#x27;&quot; -Property UserPrincipalName -ErrorAction Stop |
+            Select-Object -ExpandProperty UserPrincipalName
+    }
+}
+$upns = @($upns | Sort-Object -Unique)
+Write-Host &quot;Users to export: $($upns.Count)&quot; -ForegroundColor Cyan
+New-Item -ItemType Directory -Path $ExportPath -Force | Out-Null
+
+# --- Export each OneDrive ----------------------------------------------------
+$usersDone    = 0
+$usersSkipped = [System.Collections.Generic.List[string]]::new()
+$i = 0
+
+foreach ($upn in $upns) {
+    $i++
+    Write-Progress -Activity &#x27;Exporting OneDrives&#x27; -Status &quot;$upn ($i of $($upns.Count))&quot; -PercentComplete ($i / $upns.Count * 100)
+
+    try {
+        $drive = Get-MgUserDefaultDrive -UserId $upn -ErrorAction Stop
+        Write-Host &quot;Exporting $upn&quot; -ForegroundColor Cyan
+        Save-DriveFolder -DriveId $drive.Id -ItemId &#x27;root&#x27; -LocalPath (Join-Path -Path $ExportPath -ChildPath $upn) -IsRoot
+        $usersDone++
+    }
+    catch {
+        $usersSkipped.Add($upn)
+        Write-Warning &quot;Skipped $($upn): no OneDrive, or you are not Site Collection Administrator on it. $($_.Exception.Message)&quot;
+    }
+}
+Write-Progress -Activity &#x27;Exporting OneDrives&#x27; -Completed
+
+# --- Summary -----------------------------------------------------------------
+Write-Host &#x27;&#x27;
+Write-Host &quot;Users exported   : $usersDone of $($upns.Count)&quot; -ForegroundColor Green
+Write-Host &quot;Files downloaded : $($stats.Files) ($([math]::Round($stats.Bytes / 1GB, 2)) GB)&quot;
+Write-Host &quot;Already there    : $($stats.AlreadyThere)&quot;
+if ($stats.Failed) { Write-Host &quot;Failed           : $($stats.Failed) (see the warnings above, then run again)&quot; -ForegroundColor Red }
+if ($usersSkipped.Count) {
+    Write-Host &quot;Users skipped    : $($usersSkipped -join &#x27;, &#x27;)&quot; -ForegroundColor Yellow
+}
+if ($notExported.Count) {
+    Write-Host &quot;Not exported (OneNote notebooks or other packages): $($notExported.Count)&quot; -ForegroundColor Yellow
+    $notExported | ForEach-Object { Write-Host &quot;  $_&quot; }
+}
+Write-Host &quot;Files are in $((Resolve-Path -Path $ExportPath).Path)&quot;
+
+Disconnect-MgGraph | Out-Null</code></pre></details></div>
+<p>What changed from my first version:</p>
+<ul>
+  <li><strong>Large folders are complete.</strong> Graph returns folder contents in pages, and the first version only read the first page, so a folder with hundreds of files could be cut short. It now reads every page.</li>
+  <li><strong>You can resume.</strong> Files that are already downloaded with the same size are skipped, so a run that stops halfway can simply be started again.</li>
+  <li><strong>Fewer permissions.</strong> It asks only for <code>Files.Read.All</code> and <code>User.Read.All</code>.</li>
+  <li><strong>A summary at the end</strong> with the number of files, the total size, any failures and any OneNote notebooks, which need exporting from OneNote itself.</li>
+</ul>
+<figure class="shot"><a href="img/bulk-download-onedrive/img07.jpg" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/bulk-download-onedrive/img07.jpg" alt="Download progress" width="760" height="383" loading="lazy" decoding="async"></a><figcaption>Download progress</figcaption></figure>
+<p>Each user gets their own folder with the same structure as in OneDrive:</p>
+<figure class="shot"><a href="img/bulk-download-onedrive/img03.png" target="_blank" rel="noopener" title="Open full size" data-lightbox><img src="img/bulk-download-onedrive/img03.png" alt="Exported folders for one user" width="651" height="246" loading="lazy" decoding="async"></a><figcaption>Exported folders for one user</figcaption></figure>
+
+<h2>Step 4: Remove your access again</h2>
+<p>When the export is checked and handed over, take your Site Collection Administrator rights away so you aren't left with access to everyone's files:</p>
+<pre><code class="lang-powershell">.\Add-OneDriveSiteAdmin.ps1 -AdminUrl https://contoso-admin.sharepoint.com -UserPrincipalName admin@contoso.com -Remove</code></pre>
+
+        <nav class="article-pager" aria-label="More articles"><a class="pager-prev" href="bulk-distribution-groups-exchange.html"><span>Previous</span>Bulk create distribution groups in Exchange Online from a CSV</a><a class="pager-next" href="copy-entra-groups-between-tenants.html"><span>Next</span>Copy Entra ID groups to another tenant with PowerShell (export, import and clean-up)</a></nav>
+        <p class="back-link"><a href="index.html">← All articles</a></p>
+      </div>
+    </article>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Kamruzzaman Akib. Built with plain HTML, CSS and JavaScript, hosted free on GitHub Pages.</p>
+      <p><a href="../index.html">Home</a> · <a href="../articles/index.html">All articles</a> · <a href="../scripts/index.html">Scripts</a> · <a href="#top">Back to top</a></p>
+    </div>
+  </footer>
+  <script src="../assets/js/main.js" defer></script>
+</body>
+</html>

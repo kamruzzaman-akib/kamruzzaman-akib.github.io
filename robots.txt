@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://kamruzzamanakib.github.io/sitemap.xml
+Sitemap: https://kamruzzaman-akib.github.io/sitemap.xml
